@@ -4,6 +4,8 @@
 # Transcriptor-WOTLK
 Event logging addon for 3.3.5a, suitable for boss encounters.
 Integrates with both *DBM* and *BigWigs* backports.
+- DBM backport: https://github.com/Zidras/DBM-Icecrown/
+- BigWigs backport: https://github.com/bkader/BigWigs-WoTLK
 
 ## Screenshots
 ![image](https://user-images.githubusercontent.com/10605951/130322803-151c7345-97eb-45c2-8ba2-2c5b9e85a6be.png)
