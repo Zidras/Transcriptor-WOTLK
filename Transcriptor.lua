@@ -23,13 +23,13 @@ local compareEmotes = nil
 local compareStart = nil
 local compareAuraApplied = nil
 local compareStartTime = nil
-local collectNameplates = nil
+--local collectNameplates = nil
 local collectPlayerAuras = nil
 local hiddenUnitAuraCollector = nil
 local playerSpellCollector = nil
 local hiddenAuraPermList = {
-	[5384] = true, -- Feign Death
-	[209997] = true, -- Play Dead (Hunter Pet)
+	[5384] = true -- Feign Death
+	--[209997] = true, -- Play Dead (Hunter Pet)
 }
 local previousSpecialEvent = nil
 local hiddenAuraEngageList = nil
@@ -39,7 +39,7 @@ local mineOrPartyOrRaid = 7 -- COMBATLOG_OBJECT_AFFILIATION_MINE + COMBATLOG_OBJ
 
 local band = bit.band
 local tinsert = table.insert
-local format, find, strjoin = string.format, string.find, string.join
+local format, find, strjoin = string.format, string.find
 local tostring, tostringall = tostring, tostringall
 local type, next, print = type, next, print
 local date = date
@@ -175,28 +175,19 @@ end]]
 
 do
 
-	local function onHyperlinkLeave(self, data, link)
+	--[[local function onHyperlinkLeave(self, data, link)
 		GameTooltip:Hide()
 		updateFrame:SetScript("OnUpdate", nil)
-	end
+	end]]
 	-- Create UI spell display, copied from BasicChatMods
 	local frame, editBox = {}, {}
 	for i = 1, 4 do
-		if BackdropTemplateMixin then -- XXX Shadowlands change
-			frame[i] = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
-			frame[i].backdropInfo  = {bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-				edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-				tile = true, tileSize = 16, edgeSize = 16,
-				insets = {left = 1, right = 1, top = 1, bottom = 1}}
-			frame[i]:ApplyBackdrop()
-		else
-			frame[i] = CreateFrame("Frame", nil, UIParent)
-			frame[i]:SetBackdrop({bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-				edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-				tile = true, tileSize = 16, edgeSize = 16,
-				insets = {left = 1, right = 1, top = 1, bottom = 1}}
-			)
-		end
+		frame[i] = CreateFrame("Frame", nil, UIParent)
+		frame[i]:SetBackdrop({bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+			tile = true, tileSize = 16, edgeSize = 16,
+			insets = {left = 1, right = 1, top = 1, bottom = 1}}
+		)
 		frame[i]:SetBackdropColor(0,0,0,1)
 		frame[i]:SetWidth(650)
 		frame[i]:SetHeight(450)
@@ -244,7 +235,7 @@ do
 		local playerCastList = {}
 		local ignoreList = {
 			[43681] = true, -- Inactive (PvP)
-			[94028] = true, -- Inactive (PvP)
+			--[94028] = true, -- Inactive (PvP)
 			[66186] = true, -- Napalm (IoC PvP)
 			[66195] = true, -- Napalm (IoC PvP)
 			[66268] = true, -- Place Seaforium Bomb (IoC PvP)
@@ -266,18 +257,18 @@ do
 			[68077] = true, -- Repair Cannon (IoC PvP)
 			[68298] = true, -- Parachute (IoC PvP)
 			[68377] = true, -- Carrying Huge Seaforium (IoC PvP)
-			[270620] = true, -- Psionic Blast (Zek'voz/Uldir || Mind Controlled player)
+			--[[[270620] = true, -- Psionic Blast (Zek'voz/Uldir || Mind Controlled player)
 			[272407] = true, -- Oblivion Sphere (Mythrax/Uldir || Orb spawning on player)
 			[263372] = true, -- Power Matrix (G'huun/Uldir || Holding the orb)
 			[263436] = true, -- Imperfect Physiology (G'huun/Uldir || After the orb)
 			[263373] = true, -- Deposit Power Matrix (G'huun/Uldir)
 			[263416] = true, -- Throw Power Matrix (G'huun/Uldir)
-			[269455] = true, -- Collect Power Matrix (G'huun/Uldir)
+			[269455] = true, -- Collect Power Matrix (G'huun/Uldir)]]
 		}
 		local npcIgnoreList = {
-			[154297] = true, -- Ankoan Bladesman
+			--[[[154297] = true, -- Ankoan Bladesman
 			[154304] = true, -- Waveblade Shaman
-			[150202] = true, -- Waveblade Hunter
+			[150202] = true, -- Waveblade Hunter]]
 		}
 		local events = {
 			"SPELL_AURA_[AR][^#]+#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#([^#]+)#", -- SPELL_AURA_[AR] to filter _BROKEN
@@ -307,7 +298,7 @@ do
 							local tbl = tables[j]
 							local sortedTbl = sortedTables[j]
 							if id and flags and band(flags, mineOrPartyOrRaid) ~= 0 and not ignoreList[id] and not playerSpellBlacklist[id] and #sortedTbl < 15 then -- Check total to avoid duplicates and lock to a max of 15 for sanity
-								if not total[id] or destGUIDType ~= "" then
+								if not total[id] or destGUID ~= "" then
 									local srcGUIDType, _, _, _, _, npcIdStr = strsplit("-", srcGUID)
 									local npcId = tonumber(npcIdStr)
 									if not npcIgnoreList[npcId] then
@@ -408,7 +399,7 @@ do
 		auraTbl, castTbl, summonTbl = {}, {}, {}
 		aurasSorted, castsSorted, summonSorted = {}, {}, {}
 		ignoreList = {
-			[236283] = true, -- Belac's Prisoner
+			--[[[236283] = true, -- Belac's Prisoner
 			[236516] = true, -- Twilight Volley
 			[236519] = true, -- Moon Burn
 			[237351] = true, -- Lunar Barrage
@@ -439,7 +430,7 @@ do
 			[242696] = true, -- Deceiver's Veil
 			[230345] = true, -- Crashing Comet
 			[230348] = true, -- Fel Pool
-			[233901] = true, -- Suffocating Dark
+			[233901] = true, -- Suffocating Dark]]
 		}
 		local eventsNoSource = {
 			"SPELL_AURA_[AR][^#]+#(%d+)##([^#]+)#([^#]+%-[^#]+)#([^#]+)#(%d+)#([^#]+)#", -- SPELL_AURA_[AR] to filter _BROKEN
@@ -478,7 +469,7 @@ do
 		end
 
 		sort(aurasSorted)
-		local text = "-- AURAS\n"
+		text = "-- AURAS\n"
 		for i = 1, #aurasSorted do
 			local id = aurasSorted[i]
 			local name = GetSpellInfo(id)
@@ -631,7 +622,7 @@ eventFrame:Hide()
 local sh = {}
 
 -- The builtin strjoin doesn't handle nils ..
-local function strjoin(delimiter, ...)
+function strjoin(delimiter, ...)
 	local ret = nil
 	for i = 1, select("#", ...) do
 		ret = (ret or "") .. tostring((select(i, ...))) .. ":"
@@ -765,12 +756,12 @@ do
 		["SPELL_PERIODIC_ENERGIZE"] = true,
 	}
 	local badEvents = {
-		["SPELL_ABSORBED"] = true,
-		["SPELL_CAST_FAILED"] = true,
+		--["SPELL_ABSORBED"] = true,
+		["SPELL_CAST_FAILED"] = true
 	}
 	local guardian = 8192 -- COMBATLOG_OBJECT_TYPE_GUARDIAN
 	local dmgCache, dmgPrdcCache = {}, {}
-	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
+	--local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 	-- Note some things we are trying to avoid filtering:
 	-- BRF/Kagraz - Player damage with no source "SPELL_DAMAGE##nil#Player-GUID#PLAYER#154938#Molten Torrent#"
 	-- HFC/Socrethar - Player cast on friendly vehicle "SPELL_CAST_SUCCESS#Player-GUID#PLAYER#Vehicle-0-3151-1448-8853-90296-00001D943C#Soulbound Construct#190466#Incomplete Binding"
@@ -1141,7 +1132,7 @@ do
 	end
 end
 
-function sh.SCENARIO_UPDATE(newStep)
+--[[function sh.SCENARIO_UPDATE(newStep)
 	--Proving Grounds
 	local ret = ""
 	if C_Scenario.GetInfo() == "Proving Grounds" then
@@ -1196,7 +1187,7 @@ function sh.SCENARIO_CRITERIA_UPDATE(criteriaID)
 	end
 
 	return ret .. ret2 .. ret3
-end
+end]]
 
 function sh.ZONE_CHANGED(...)
 	return strjoin("#", GetZoneText() or "?", GetRealZoneText() or "?", GetSubZoneText() or "?", ...)
@@ -1205,7 +1196,7 @@ sh.ZONE_CHANGED_INDOORS = sh.ZONE_CHANGED
 sh.ZONE_CHANGED_NEW_AREA = sh.ZONE_CHANGED
 
 function sh.CINEMATIC_START(...)
-	local id = -(GetBestMapForUnit("player"))
+	local id = GetCurrentMapAreaID()
 	return strjoin("#", "uiMapID:", id, "Real Args:", tostringall(...))
 end
 
@@ -1279,14 +1270,14 @@ do
 	end
 end
 
-function sh.NAME_PLATE_UNIT_ADDED(unit)
+--[[function sh.NAME_PLATE_UNIT_ADDED(unit)
 	local guid = UnitGUID(unit)
 	if not collectNameplates[guid] then
 		collectNameplates[guid] = true
 		local name = UnitName(unit)
 		return strjoin("#", name, guid)
 	end
-end
+end]]
 
 local wowEvents = {
 	-- Raids
@@ -1322,10 +1313,10 @@ local wowEvents = {
 	"ZONE_CHANGED",
 	"ZONE_CHANGED_INDOORS",
 	"ZONE_CHANGED_NEW_AREA",
-	"NAME_PLATE_UNIT_ADDED",
+	--"NAME_PLATE_UNIT_ADDED",
 	-- Scenarios
-	"SCENARIO_UPDATE",
-	"SCENARIO_CRITERIA_UPDATE",
+	--"SCENARIO_UPDATE",
+	--"SCENARIO_CRITERIA_UPDATE",
 	-- Movies
 	"PLAY_MOVIE",
 	"CINEMATIC_START",
@@ -1385,7 +1376,7 @@ local eventCategories = {
 	PLAYER_TARGET_CHANGED = "NONE",
 	CHAT_MSG_ADDON = "NONE",
 	CHAT_MSG_RAID_WARNING = "NONE",
-	NAME_PLATE_UNIT_ADDED = "NONE",
+	--NAME_PLATE_UNIT_ADDED = "NONE",
 	UPDATE_WORLD_STATES = "WORLD_STATE",
 	WORLD_STATE_UI_TIMER_UPDATE = "WORLD_STATE",
 }
@@ -1543,7 +1534,6 @@ end
 
 local init = CreateFrame("Frame")
 init:SetScript("OnEvent", function(self, event)
-	print("test")
 	if type(TranscriptDB) ~= "table" then TranscriptDB = {} end
 	if type(TranscriptIgnore) ~= "table" then TranscriptIgnore = {} end
 
@@ -1724,7 +1714,7 @@ do
 				end
 			end]]
 
-			collectNameplates = {}
+			--collectNameplates = {}
 			hiddenUnitAuraCollector = {}
 			playerSpellCollector = {}
 			previousSpecialEvent = nil
@@ -2236,7 +2226,7 @@ function Transcriptor:StopLog(silent)
 		compareStartTime = nil
 		collectPlayerAuras = nil
 		logStartTime = nil
-		collectNameplates = nil
+		--collectNameplates = nil
 		hiddenUnitAuraCollector = nil
 		playerSpellCollector = nil
 

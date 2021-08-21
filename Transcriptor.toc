@@ -22,4 +22,3 @@ libs\LibDBIcon-1.0.lua
 SpellBlacklist.lua
 SpecialEvents.lua
 Transcriptor.lua
-
