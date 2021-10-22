@@ -12,10 +12,11 @@ Integrates with both *DBM* and *BigWigs* backports.
 ![image](https://user-images.githubusercontent.com/10605951/130322851-3ff67da9-0cef-4f86-a31b-bd22891d92ba.png)
 
 ## How to use
-1. `/ts` at the start of the pull.
-2. `/ts` at the end of the fight.
-3. `/reload`
-4. Go to your `WTF/Account/<name>/SavedVariables/Transcriptor.lua` to view the log.
+1. For DBM backport (https://github.com/Zidras/DBM-Warmane) users, write `/dbm debug` in chat to enable DBM debug messages. Doing that in conjunction with Transcriptor logs all DBM debug messages too.
+2. `/ts` at the start of the pull.
+3. `/ts` at the end of the fight.
+4. `/reload`
+5. Go to your `WTF/Account/<name>/SavedVariables/Transcriptor.lua` to view the log.
   
 ## How to install and update the addon
 1. Download the addon from the **main** repository (https://github.com/Zidras/Transcriptor-WOTLK/archive/refs/heads/main.zip).
