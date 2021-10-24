@@ -12,7 +12,7 @@ Integrates with both *DBM* and *BigWigs* backports.
 ![image](https://user-images.githubusercontent.com/10605951/130322851-3ff67da9-0cef-4f86-a31b-bd22891d92ba.png)
 
 ## How to use
-1. For DBM backport (https://github.com/Zidras/DBM-Warmane) users, write `/dbm debug` in chat to enable DBM debug messages. Doing that in conjunction with Transcriptor logs all DBM debug messages too.
+1. For DBM backport (https://github.com/Zidras/DBM-Warmane) users, write `/dbm debug` and `/dbm debuglevel 2` in chat to enable DBM debug messages. Doing that in conjunction with Transcriptor logs all DBM debug messages too.
 2. `/ts` at the start of the pull.
 3. `/ts` at the end of the fight.
 4. `/reload`
