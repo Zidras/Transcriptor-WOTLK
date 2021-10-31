@@ -20,7 +20,6 @@ Integrates with both *DBM* and *BigWigs* backports.
   
 ## How to install and update the addon
 1. Download the addon from the **main** repository (https://github.com/Zidras/Transcriptor-WOTLK/archive/refs/heads/main.zip).
-2. Inside the zip file, select Transcriptor-WOTLK-main and copy (Ctrl+C) the folder over to your addons folder (Interface/Addons). 
-3. Rename the copied folder to Transcriptor.
+2. Inside the zip file, open Transcriptor-WOTLK-main and copy (Ctrl+C) **Transcriptor** folder over to your addons folder (Interface/Addons). 
 
 ![image](https://user-images.githubusercontent.com/10605951/130323064-08002ea7-550b-4df3-a877-4bfd6a349f2a.png)
