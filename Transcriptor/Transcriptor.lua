@@ -1536,6 +1536,7 @@ local init = CreateFrame("Frame")
 init:SetScript("OnEvent", function(self, event)
 	if type(TranscriptDB) ~= "table" then TranscriptDB = {} end
 	if type(TranscriptIgnore) ~= "table" then TranscriptIgnore = {} end
+	if type(TranscriptOptions) ~= "table" then TranscriptOptions = {} end
 
 	tinsert(menu, { text = L["|cFFFFD200Transcriptor|r - Disabled Events"], fontObject = "GameTooltipHeader", notCheckable = 1 })
 	insertMenuItems(wowEvents)
@@ -1561,8 +1562,9 @@ init:SetScript("OnEvent", function(self, event)
 
 	-- Addon Minimap Icon snippet
 	local DBI = LibStub("LibDBIcon-1.0", true)
+	TranscriptOptions.minimap = TranscriptOptions.minimap or {hide = false, minimapPos = 180}
 	if DBI and not DBI:IsRegistered("Transcriptor") then
-		DBI:Register("Transcriptor", ldb, ldb.icon)
+		DBI:Register("Transcriptor", ldb, TranscriptOptions.minimap)
 	end
 	-- End Minimap Icon snippet
 
