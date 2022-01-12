@@ -1687,7 +1687,8 @@ do
 	end
 
 	local wowVersion, buildRevision = GetBuildInfo() -- Note that both returns here are strings, not numbers.
-	local logNameFormat = "[%s]@[%s] - Zone:%d = %s/%s, Difficulty:%d (%s), Type:%s, " .. format("Version: %s.%s", wowVersion, buildRevision)
+	local realmName = GetRealmName()
+	local logNameFormat = "[%s]@[%s] - Zone:%d = %s/%s, Difficulty:%d (%s), Type:%s, " .. format("Version: %s.%s - Server: %s", wowVersion, buildRevision, realmName)
 	function Transcriptor:StartLog(silent)
 		if logging then
 			print(L["You are already logging an encounter."])
