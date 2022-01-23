@@ -1666,7 +1666,13 @@ do
 				end
 			else -- Non-dynamic raids
 				if difficulty == 1 then
-					return instanceName, instanceType, difficulty, maxPlayers and maxPlayers.." Normal" or "10 Normal"
+					-- check for Timewalking instance (workaround using GetRaidDifficulty since on Warmane all the usual APIs fail and return "normal" difficulty)
+					local raidDifficulty = GetRaidDifficulty()
+					if raidDifficulty ~= difficulty and (raidDifficulty == 2 or raidDifficulty == 4) then -- extra checks due to lack of tests and no access to a timewalking server
+						return instanceName, instanceType, raidDifficulty, "Timewalking"
+					else
+						return instanceName, instanceType, difficulty, maxPlayers and maxPlayers.." Normal" or "10 Normal"
+					end
 				elseif difficulty == 2 then
 					return instanceName, instanceType, difficulty, "25 Normal"
 				elseif difficulty == 3 then
