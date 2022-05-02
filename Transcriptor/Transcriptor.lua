@@ -1685,7 +1685,13 @@ do
 			if difficulty == 1 then
 				return instanceName, instanceType, difficulty, "5 Normal"
 			elseif difficulty == 2 then
-				return instanceName, instanceType, difficulty, "5 Heroic"
+				-- check for Mythic instance (workaround using GetDungeonDifficulty since on Warmane all the usual APIs fail and return "heroic" difficulty)
+				local dungeonDifficulty = GetDungeonDifficulty()
+				if dungeonDifficulty == 3 then
+					return "mythic", difficultyName.." - ", dungeonDifficulty, maxPlayers
+				else
+					return "heroic5", difficultyName.." - ", difficulty, maxPlayers
+				end
 			end
 		else
 			return instanceName, instanceType, difficulty, NONE
