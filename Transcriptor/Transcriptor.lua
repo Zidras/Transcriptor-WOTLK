@@ -642,81 +642,6 @@ function sh.UPDATE_WORLD_STATES()
 end
 sh.WORLD_STATE_UI_TIMER_UPDATE = sh.UPDATE_WORLD_STATES
 
---[[
-	UIWidget
-
-	see https://wow.gamepedia.com/UPDATE_UI_WIDGET
-
-	widgetID =
-		The Black Morass: 507 (health), 527 (waves)
-		The Violet Hold (WotLK): 565 (health), 566 (waves)
-]]
-do
-	local blackList = {
-		[1309] = true, -- C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(1309)
-		[1311] = true, -- C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(1311)
-		[1313] = true, -- C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(1313)
-		[1315] = true, -- C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(1315)
-		[1317] = true, -- C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(1317)
-		[1319] = true, -- C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo(1319)
-
-		--[[ Shadowlands - Castle Nathria ]]--
-		[2436] = true, -- Lady Inerva Darkvein, static icon (widgetType:13)
-		[2437] = true, -- Lady Inerva Darkvein, static icon (widgetType:13)
-		[2438] = true, -- Lady Inerva Darkvein, static icon (widgetType:13)
-		[2439] = true, -- Lady Inerva Darkvein, static icon (widgetType:13)
-	}
-
-	-- Each widgetType has a different function to get all data for the widget.
-	-- Those function names are consistent with the enum.
-	local widgetFuncs = {}
-	--[[for name,n in pairs(Enum.UIWidgetVisualizationType) do
-		widgetFuncs[n] = C_UIWidgetManager["Get"..name.. "WidgetVisualizationInfo"] or C_UIWidgetManager["Get"..name.."VisualizationInfo"]
-	end]]
-
-	function sh.UPDATE_UI_WIDGET(tbl)
-		if blackList[tbl.widgetID] then return end
-
-		-- Store widget data, so we're able to only add changes to the log
-		if not currentLog.WIDGET then currentLog.WIDGET = {} end
-
-		local txt
-		if not currentLog.WIDGET[tbl.widgetID] then -- New widget in this log
-			currentLog.WIDGET[tbl.widgetID] = {}
-			for k, v in next, tbl do
-				if not txt then
-					txt = format("%s:%s", k, v)
-				else
-					txt = format("%s, %s:%s", txt, k, v)
-				end
-			end
-		else -- Shorter output with just the id
-			txt = format("%s:%s", "widgetID", tbl.widgetID)
-		end
-
-		if tbl.widgetType and widgetFuncs[tbl.widgetType] then
-			local t = widgetFuncs[tbl.widgetType](tbl.widgetID)
-			if t then
-				for k, v in next, t do
-					if type(v) == "table" then -- We don't care about data in tables
-						v = "table"
-					elseif type(v) == "boolean" then -- Needs to be done manually in Lua 5.1
-						v = tostring(v)
-					end
-
-					-- Only add data to log if it's new or it changed to reduce spam
-					if not currentLog.WIDGET[tbl.widgetID][k] or currentLog.WIDGET[tbl.widgetID][k] ~= v then
-						currentLog.WIDGET[tbl.widgetID][k] = v
-						txt = format("%s, %s:%s", txt, k, v)
-					end
-				end
-			end
-		end
-
-		return txt
-	end
-end
-
 do
 	badSourcelessPlayerSpellList = {
 		[81782] = true, -- Power Word: Barrier
@@ -1113,9 +1038,9 @@ function sh.INSTANCE_ENCOUNTER_ENGAGE_UNIT(...)
 	)
 end
 
-function sh.UNIT_TARGETABLE_CHANGED(unit)
+--[[function sh.UNIT_TARGETABLE_CHANGED(unit)
 	return format("-%s- [CanAttack:%s#Exists:%s#IsVisible:%s#Name:%s#GUID:%s#Classification:%s#Health:%s]", tostringall(unit, UnitCanAttack("player", unit), UnitExists(unit), UnitIsVisible(unit), UnitName(unit), UnitGUID(unit), UnitClassification(unit), (UnitHealth(unit))))
-end
+end]]
 
 do
 	local allowedPowerUnits = {
@@ -1203,14 +1128,16 @@ end
 function sh.CHAT_MSG_ADDON(prefix, msg, channel, sender)
 	if prefix == "Transcriptor" then
 		return strjoin("#", "RAID_BOSS_WHISPER_SYNC", msg, sender)
+	elseif DBM and prefix:sub(1, 5) == "DBMv4" then
+		return strjoin("#", "DBM_SYNC", prefix, msg, sender, channel)
 	end
 end
 
-function sh.ENCOUNTER_START(...)
+--[[function sh.ENCOUNTER_START(...)
 	compareStartTime = debugprofilestop()
 	wipe(data)
 	return strjoin("#", ...)
-end
+end]]
 
 function sh.CHAT_MSG_RAID_BOSS_EMOTE(msg, npcName, ...)
 	local id = msg:match("|Hspell:([^|]+)|h")
@@ -1302,26 +1229,26 @@ local wowEvents = {
 	"UNIT_SPELLCAST_CHANNEL_START",
 	"UNIT_SPELLCAST_CHANNEL_STOP",
 	"UNIT_POWER_UPDATE",
-	"UPDATE_UI_WIDGET",
+--	"UPDATE_UI_WIDGET",
 	"UNIT_AURA",
 	"UNIT_TARGET",
 	"INSTANCE_ENCOUNTER_ENGAGE_UNIT",
-	"UNIT_TARGETABLE_CHANGED",
-	"ENCOUNTER_START",
-	"ENCOUNTER_END",
-	"BOSS_KILL",
+--	"UNIT_TARGETABLE_CHANGED",
+--	"ENCOUNTER_START",
+--	"ENCOUNTER_END",
+--	"BOSS_KILL",
 	"ZONE_CHANGED",
 	"ZONE_CHANGED_INDOORS",
 	"ZONE_CHANGED_NEW_AREA",
-	--"NAME_PLATE_UNIT_ADDED",
+--	"NAME_PLATE_UNIT_ADDED",
 	-- Scenarios
-	--"SCENARIO_UPDATE",
-	--"SCENARIO_CRITERIA_UPDATE",
+--	"SCENARIO_UPDATE",
+--	"SCENARIO_CRITERIA_UPDATE",
 	-- Movies
 	"PLAY_MOVIE",
 	"CINEMATIC_START",
 	-- Battlegrounds
-	"START_TIMER",
+--	"START_TIMER",
 	"CHAT_MSG_BG_SYSTEM_HORDE",
 	"CHAT_MSG_BG_SYSTEM_ALLIANCE",
 	"CHAT_MSG_BG_SYSTEM_NEUTRAL",
@@ -1333,11 +1260,11 @@ local wowEvents = {
 local eventCategories = {
 	PLAYER_REGEN_DISABLED = "COMBAT",
 	PLAYER_REGEN_ENABLED = "COMBAT",
-	ENCOUNTER_START = "COMBAT",
-	ENCOUNTER_END = "COMBAT",
-	BOSS_KILL = "COMBAT",
+--	ENCOUNTER_START = "COMBAT",
+--	ENCOUNTER_END = "COMBAT",
+--	BOSS_KILL = "COMBAT",
 	INSTANCE_ENCOUNTER_ENGAGE_UNIT = "COMBAT",
-	UNIT_TARGETABLE_CHANGED = "COMBAT",
+--	UNIT_TARGETABLE_CHANGED = "COMBAT",
 	CHAT_MSG_MONSTER_EMOTE = "MONSTER",
 	CHAT_MSG_MONSTER_SAY = "MONSTER",
 	CHAT_MSG_MONSTER_WHISPER = "MONSTER",
@@ -1356,8 +1283,8 @@ local eventCategories = {
 	ZONE_CHANGED = "ZONE_CHANGED",
 	ZONE_CHANGED_INDOORS = "ZONE_CHANGED",
 	ZONE_CHANGED_NEW_AREA = "ZONE_CHANGED",
-	SCENARIO_UPDATE = "SCENARIO",
-	SCENARIO_CRITERIA_UPDATE = "SCENARIO",
+--	SCENARIO_UPDATE = "SCENARIO",
+--	SCENARIO_CRITERIA_UPDATE = "SCENARIO",
 	PLAY_MOVIE = "MOVIE",
 	CINEMATIC_START = "MOVIE",
 	START_TIMER = "PVP",
@@ -1376,7 +1303,7 @@ local eventCategories = {
 	PLAYER_TARGET_CHANGED = "NONE",
 	CHAT_MSG_ADDON = "NONE",
 	CHAT_MSG_RAID_WARNING = "NONE",
-	--NAME_PLATE_UNIT_ADDED = "NONE",
+--	NAME_PLATE_UNIT_ADDED = "NONE",
 	UPDATE_WORLD_STATES = "WORLD_STATE",
 	WORLD_STATE_UI_TIMER_UPDATE = "WORLD_STATE",
 }
