@@ -1342,6 +1342,15 @@ local function eventHandler(self, event, ...)
 		if cat ~= "NONE" then
 			if type(currentLog[cat]) ~= "table" then currentLog[cat] = {} end
 			tinsert(currentLog[cat], text)
+		else
+			if event == "CHAT_MSG_ADDON" then
+				local prefix = ...
+				if prefix:sub(1, 5) == "DBMv4" then
+					cat = "DBM"
+					if type(currentLog[cat]) ~= "table" then currentLog[cat] = {} end
+					tinsert(currentLog[cat], text)
+				end
+			end
 		end
 	end
 end
