@@ -909,10 +909,10 @@ do
 	local UnitIsUnit = UnitIsUnit
 	local wantedUnits = {
 		target = true, focus = true,
-		nameplate1 = true, nameplate2 = true, nameplate3 = true, nameplate4 = true, nameplate5 = true, nameplate6 = true, nameplate7 = true, nameplate8 = true, nameplate9 = true, nameplate10 = true,
-		nameplate11 = true, nameplate12 = true, nameplate13 = true, nameplate14 = true, nameplate15 = true, nameplate16 = true, nameplate17 = true, nameplate18 = true, nameplate19 = true, nameplate20 = true,
-		nameplate21 = true, nameplate22 = true, nameplate23 = true, nameplate24 = true, nameplate25 = true, nameplate26 = true, nameplate27 = true, nameplate28 = true, nameplate29 = true, nameplate30 = true,
-		nameplate31 = true, nameplate32 = true, nameplate33 = true, nameplate34 = true, nameplate35 = true, nameplate36 = true, nameplate37 = true, nameplate38 = true, nameplate39 = true, nameplate40 = true,
+		-- nameplate1 = true, nameplate2 = true, nameplate3 = true, nameplate4 = true, nameplate5 = true, nameplate6 = true, nameplate7 = true, nameplate8 = true, nameplate9 = true, nameplate10 = true,
+		-- nameplate11 = true, nameplate12 = true, nameplate13 = true, nameplate14 = true, nameplate15 = true, nameplate16 = true, nameplate17 = true, nameplate18 = true, nameplate19 = true, nameplate20 = true,
+		-- nameplate21 = true, nameplate22 = true, nameplate23 = true, nameplate24 = true, nameplate25 = true, nameplate26 = true, nameplate27 = true, nameplate28 = true, nameplate29 = true, nameplate30 = true,
+		-- nameplate31 = true, nameplate32 = true, nameplate33 = true, nameplate34 = true, nameplate35 = true, nameplate36 = true, nameplate37 = true, nameplate38 = true, nameplate39 = true, nameplate40 = true,
 	}
 	local bossUnits = {
 		boss1 = true, boss2 = true, boss3 = true, boss4 = true, boss5 = true,
@@ -960,28 +960,28 @@ do
 	--local prevCast = nil
 	function sh.UNIT_SPELLCAST_SUCCEEDED(unit, spellName, ...)
 		if safeUnit(unit) then
-			--[[if castId ~= prevCast then
-				prevCast = castId
+			--if castId ~= prevCast then
+			--	prevCast = castId
 				if not compareUnitSuccess then compareUnitSuccess = {} end
-				if not compareUnitSuccess[spellId] then compareUnitSuccess[spellId] = {} end
+				if not compareUnitSuccess[spellName] then compareUnitSuccess[spellName] = {} end
 				local npcId = MobId(UnitGUID(unit), true)
-				if not compareUnitSuccess[spellId][npcId] then
+				if not compareUnitSuccess[spellName][npcId] then
 					if previousSpecialEvent then
-						compareUnitSuccess[spellId][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+						compareUnitSuccess[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
 					else
-						compareUnitSuccess[spellId][npcId] = {compareStartTime}
+						compareUnitSuccess[spellName][npcId] = {compareStartTime}
 					end
 				end
-				compareUnitSuccess[spellId][npcId][#compareUnitSuccess[spellId][npcId]+1] = debugprofilestop()
+				compareUnitSuccess[spellName][npcId][#compareUnitSuccess[spellName][npcId]+1] = debugprofilestop()
 
-				if specialEvents.UNIT_SPELLCAST_SUCCEEDED[spellId] then
+				if specialEvents.UNIT_SPELLCAST_SUCCEEDED[spellName] then
 					local npcIdBasic = MobId((UnitGUID(unit)))
-					local name = specialEvents.UNIT_SPELLCAST_SUCCEEDED[spellId][npcIdBasic]
+					local name = specialEvents.UNIT_SPELLCAST_SUCCEEDED[spellName][npcIdBasic]
 					if name then
 						InsertSpecialEvent(name)
 					end
 				end
-			end]]
+			--end
 
 			return format("%s(%s) -%s- [[%s]]", UnitName(unit), UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
 		--elseif raidList[unit] and not playerSpellBlacklist[spellId] then
@@ -2004,7 +2004,7 @@ function Transcriptor:StopLog(silent)
 				for id,tbl in next, compareUnitSuccess do
 					for npcId, list in next, tbl do
 						if not compareSuccess or not compareSuccess[id] or not compareSuccess[id][npcId] then
-							local n = format("%s-%d-npc:%s", GetSpellInfo(id), id, npcId)
+							local n = format("%s-npc:%s", id, npcId)
 							local str
 							for i = 2, #list do
 								if not str then
