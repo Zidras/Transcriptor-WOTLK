@@ -1141,8 +1141,8 @@ end]]
 
 function sh.CHAT_MSG_RAID_BOSS_EMOTE(msg, npcName, ...)
 	local id = msg:match("|Hspell:([^|]+)|h")
-	if id then
-		local spellId = tonumber(id)
+	if msg then
+		local spellId = id and tonumber(id) or msg -- aggregate emotes by its spellId (only seen it in one WotLK private server, so also aggregate by msg)
 		if spellId then
 			if not compareEmotes then compareEmotes = {} end
 			if not compareEmotes[spellId] then compareEmotes[spellId] = {} end
@@ -1318,6 +1318,7 @@ local dbmEvents = {
 	"DBM_TimerStart",
 	"DBM_TimerStop",
 	"DBM_SetStage",
+	"DBM_Pull",
 }
 
 local function eventHandler(self, event, ...)
@@ -1332,8 +1333,12 @@ local function eventHandler(self, event, ...)
 	local stop = debugprofilestop() / 1000
 	local t = stop - logStartTime
 	local time = date("%H:%M:%S")
+	-- Use DBM StartCombat callback to emulate ENCOUNTER_START
+	if event == "DBM_Pull" then
+		compareStartTime = debugprofilestop()
+		wipe(data)
 	-- We only have CLEU in the total log, it's way too much information to log twice.
-	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		currentLog.total[#currentLog.total+1] = format("<%.2f %s> [CLEU] %s", t, time, line)
 	else
 		local text = format("<%.2f %s> [%s] %s", t, time, event, line)
@@ -2075,7 +2080,8 @@ function Transcriptor:StopLog(silent)
 				currentLog.TIMERS.EMOTES = {}
 				for id,tbl in next, compareEmotes do
 					for npcName, list in next, tbl do
-						local n = format("%s-%d-npc:%s", GetSpellInfo(id) or "?", id, npcName)
+						local msgID = id and GetSpellInfo(id) or "?" -- WotLK emotes generally don't have a spellID, parsing msg as well
+						local n = format("%s-%s-npc:%s", msgID, id, npcName)
 						local str
 						for i = 2, #list do
 							if not str then
