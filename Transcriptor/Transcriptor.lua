@@ -34,7 +34,7 @@ local hiddenAuraPermList = {
 local previousSpecialEvent = nil
 local hiddenAuraEngageList = nil
 local shouldLogFlags = false
-local inEncounter, blockingRelease, limitingRes = false, false, false
+--local inEncounter, blockingRelease, limitingRes = false, false, false
 local mineOrPartyOrRaid = 7 -- COMBATLOG_OBJECT_AFFILIATION_MINE + COMBATLOG_OBJECT_AFFILIATION_PARTY + COMBATLOG_OBJECT_AFFILIATION_RAID
 
 local band = bit.band
@@ -1048,13 +1048,31 @@ do
 		arena1 = true, arena2 = true, arena3 = true, arena4 = true, arena5 = true,
 		arenapet1 = true, arenapet2 = true, arenapet3 = true, arenapet4 = true, arenapet5 = true
 	}
-	function sh.UNIT_POWER_UPDATE(unit, typeName)
+	--[[function sh.UNIT_POWER_UPDATE(unit, typeName)
 		if not allowedPowerUnits[unit] then return end
 		local powerType = format("TYPE:%s/%d", typeName, UnitPowerType(unit))
 		local mainPower = format("MAIN:%d/%d", UnitPower(unit), UnitPowerMax(unit))
 		local altPower = format("ALT:%d/%d", UnitPower(unit, 10), UnitPowerMax(unit, 10))
 		return strjoin("#", unit, UnitName(unit), powerType, mainPower, altPower)
+	end]]
+	function sh.UNIT_ENERGY(unit)
+		if not allowedPowerUnits[unit] then return end
+		local powerTypeIndex, typeName = UnitPowerType(unit)
+		local powerType = format("TYPE:%s/%d", typeName, powerTypeIndex)
+		local mainPower = format("MAIN:%d/%d", UnitPower(unit), UnitPowerMax(unit))
+		return strjoin("#", unit, UnitName(unit), powerType, mainPower)
 	end
+	sh.UNIT_FOCUS			= sh.UNIT_ENERGY
+	sh.UNIT_HAPPINESS		= sh.UNIT_ENERGY
+	sh.UNIT_MANA			= sh.UNIT_ENERGY
+	sh.UNIT_RAGE			= sh.UNIT_ENERGY
+	sh.UNIT_RUNIC_POWER		= sh.UNIT_ENERGY
+	sh.UNIT_MAXENERGY		= sh.UNIT_ENERGY
+	sh.UNIT_MAXFOCUS		= sh.UNIT_ENERGY
+	sh.UNIT_MAXHAPPINESS	= sh.UNIT_ENERGY
+	sh.UNIT_MAXMANA			= sh.UNIT_ENERGY
+	sh.UNIT_MAXRAGE			= sh.UNIT_ENERGY
+	sh.UNIT_MAXRUNIC_POWER	= sh.UNIT_ENERGY
 end
 
 --[[function sh.SCENARIO_UPDATE(newStep)
@@ -1228,7 +1246,19 @@ local wowEvents = {
 	"UNIT_SPELLCAST_INTERRUPTED",
 	"UNIT_SPELLCAST_CHANNEL_START",
 	"UNIT_SPELLCAST_CHANNEL_STOP",
-	"UNIT_POWER_UPDATE",
+--	"UNIT_POWER_UPDATE",
+	"UNIT_ENERGY",
+	"UNIT_FOCUS",
+	"UNIT_HAPPINESS",
+	"UNIT_MANA",
+	"UNIT_RAGE",
+	"UNIT_RUNIC_POWER",
+	"UNIT_MAXENERGY",
+	"UNIT_MAXFOCUS",
+	"UNIT_MAXHAPPINESS",
+	"UNIT_MAXMANA",
+	"UNIT_MAXRAGE",
+	"UNIT_MAXRUNIC_POWER",
 --	"UPDATE_UI_WIDGET",
 	"UNIT_AURA",
 	"UNIT_TARGET",
@@ -1280,6 +1310,18 @@ local eventCategories = {
 	UNIT_SPELLCAST_CHANNEL_START = "UNIT_SPELLCAST",
 	UNIT_SPELLCAST_CHANNEL_STOP = "UNIT_SPELLCAST",
 	UNIT_TARGET = "UNIT_SPELLCAST",
+	UNIT_ENERGY = "UNIT_POWER_UPDATE",
+	UNIT_FOCUS = "UNIT_POWER_UPDATE",
+	UNIT_HAPPINESS = "UNIT_POWER_UPDATE",
+	UNIT_MANA = "UNIT_POWER_UPDATE",
+	UNIT_RAGE = "UNIT_POWER_UPDATE",
+	UNIT_RUNIC_POWER = "UNIT_POWER_UPDATE",
+	UNIT_MAXENERGY = "UNIT_POWER_UPDATE",
+	UNIT_MAXFOCUS = "UNIT_POWER_UPDATE",
+	UNIT_MAXHAPPINESS = "UNIT_POWER_UPDATE",
+	UNIT_MAXMANA = "UNIT_POWER_UPDATE",
+	UNIT_MAXRAGE = "UNIT_POWER_UPDATE",
+	UNIT_MAXRUNIC_POWER	= "UNIT_POWER_UPDATE",
 	ZONE_CHANGED = "ZONE_CHANGED",
 	ZONE_CHANGED_INDOORS = "ZONE_CHANGED",
 	ZONE_CHANGED_NEW_AREA = "ZONE_CHANGED",
@@ -1287,7 +1329,7 @@ local eventCategories = {
 --	SCENARIO_CRITERIA_UPDATE = "SCENARIO",
 	PLAY_MOVIE = "MOVIE",
 	CINEMATIC_START = "MOVIE",
-	START_TIMER = "PVP",
+--	START_TIMER = "PVP",
 	CHAT_MSG_BG_SYSTEM_HORDE = "PVP",
 	CHAT_MSG_BG_SYSTEM_ALLIANCE = "PVP",
 	CHAT_MSG_BG_SYSTEM_NEUTRAL = "PVP",
@@ -1544,7 +1586,12 @@ do
 		"raid31", "raid32", "raid33", "raid34", "raid35", "raid36", "raid37", "raid38", "raid39", "raid40"
 	}
 	local partyList = {"player", "party1", "party2", "party3", "party4"}
-	local IsInRaid = IsInRaid
+
+	local GetNumRaidMembers, GetNumPartyMembers = GetNumRaidMembers, GetNumPartyMembers
+
+	local function IsInRaid()
+		return GetNumRaidMembers() > 0
+	end
 
 	local function GetNumGroupMembers()
 		return IsInRaid() and GetNumRaidMembers() or GetNumPartyMembers()
