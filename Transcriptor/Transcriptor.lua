@@ -1337,6 +1337,9 @@ local function eventHandler(self, event, ...)
 	if event == "DBM_Pull" then
 		compareStartTime = debugprofilestop()
 		wipe(data)
+	elseif event == "DBM_SetStage" then
+		local _, _, phase = ...
+		InsertSpecialEvent("Stage "..phase)
 	-- We only have CLEU in the total log, it's way too much information to log twice.
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		currentLog.total[#currentLog.total+1] = format("<%.2f %s> [CLEU] %s", t, time, line)
