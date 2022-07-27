@@ -28,7 +28,7 @@ local collectPlayerAuras = nil
 local hiddenUnitAuraCollector = nil
 local playerSpellCollector = nil
 local hiddenAuraPermList = {
-	[5384] = true -- Feign Death
+	[5384] = true, -- Feign Death
 	--[209997] = true, -- Play Dead (Hunter Pet)
 }
 local previousSpecialEvent = nil
@@ -39,7 +39,8 @@ local mineOrPartyOrRaid = 7 -- COMBATLOG_OBJECT_AFFILIATION_MINE + COMBATLOG_OBJ
 
 local band = bit.band
 local tinsert = table.insert
-local format, find, strjoin = string.format, string.find
+local format, find = string.format, string.find
+local strjoin -- defined later since wow API errors with nil values
 local tostring, tostringall = tostring, tostringall
 local type, next, print = type, next, print
 local date = date
@@ -625,7 +626,7 @@ local sh = {}
 function strjoin(delimiter, ...)
 	local ret = nil
 	for i = 1, select("#", ...) do
-		ret = (ret or "") .. tostring((select(i, ...))) .. ":"
+		ret = (ret or "") .. tostring((select(i, ...))) .. ":" -- ignoring delimiter arg, but ":" gives better legibility anyway, so keep it
 	end
 	return ret
 end
@@ -1814,7 +1815,7 @@ function Transcriptor:StopLog(silent)
 		end
 		if DBM and DBM.UnregisterCallback then
 			for i, event in next, dbmEvents do
-				DBM:UnregisterCallback(event)
+				DBM:UnregisterCallback(event, DBMEventHandler)
 			end
 		end
 		--Notify Stop
