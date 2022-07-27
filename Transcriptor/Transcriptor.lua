@@ -947,12 +947,12 @@ do
 
 	function sh.UNIT_SPELLCAST_INTERRUPTED(unit, spellName, ...)
 		if safeUnit(unit) then
-			--[[if specialEvents.UNIT_SPELLCAST_INTERRUPTED[spellId] then
-				local name = specialEvents.UNIT_SPELLCAST_INTERRUPTED[spellId][MobId(UnitGUID(unit))]
+			if specialEvents.UNIT_SPELLCAST_INTERRUPTED[spellName] then
+				local name = specialEvents.UNIT_SPELLCAST_INTERRUPTED[spellName][MobId(UnitGUID(unit))]
 				if name then
 					InsertSpecialEvent(name)
 				end
-			end]]
+			end
 
 			return format("%s(%s) -%s- [[%s]]", UnitName(unit), UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
 		end
