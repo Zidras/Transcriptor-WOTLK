@@ -6,7 +6,7 @@
 ## Notes-koKR: 우두머리 전투 기록 유틸리티입니다.
 ## Notes-ruRU: Утилита для логирования битв с боссами.
 ## Author: Funkydude
-## Version: 9.1.7
+## Version: 9.2.6
 ## X-Credits: Kyahx, Rabbit, MysticalOS, nebula169
 ## X-Category: Development Tools
 ## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
