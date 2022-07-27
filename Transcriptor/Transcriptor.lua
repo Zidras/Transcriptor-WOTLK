@@ -21,6 +21,7 @@ local compareSuccess = nil
 local compareUnitSuccess = nil
 local compareEmotes = nil
 local compareStart = nil
+local compareUnitStart = nil
 local compareAuraApplied = nil
 local compareStartTime = nil
 --local collectNameplates = nil
@@ -108,6 +109,13 @@ local function InsertSpecialEvent(name)
 	end
 	if compareUnitSuccess then
 		for id,tbl in next, compareUnitSuccess do
+			for npcId, list in next, tbl do
+				list[#list+1] = {t, name}
+			end
+		end
+	end
+	if compareUnitStart then
+		for id,tbl in next, compareUnitStart do
 			for npcId, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
@@ -994,6 +1002,26 @@ do
 	end
 	function sh.UNIT_SPELLCAST_START(unit, spellName, ...)
 		if safeUnit(unit) then
+			if not compareUnitStart then compareUnitStart = {} end
+			if not compareUnitStart[spellName] then compareUnitStart[spellName] = {} end
+			local npcId = MobId(UnitGUID(unit), true)
+			if not compareUnitStart[spellName][npcId] then
+--				if previousSpecialEvent then
+--					compareUnitStart[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+--				else
+					compareUnitStart[spellName][npcId] = {compareStartTime}
+--				end
+			end
+			compareUnitStart[spellName][npcId][#compareUnitStart[spellName][npcId]+1] = debugprofilestop()
+
+--			if specialEvents.UNIT_SPELLCAST_START[spellName] then
+--				local npcIdBasic = MobId((UnitGUID(unit)))
+--				local name = specialEvents.UNIT_SPELLCAST_START[spellName][npcIdBasic]
+--				if name then
+--					InsertSpecialEvent(name)
+--				end
+--			end
+
 			local _, _, _, _, startTime, endTime = UnitCastingInfo(unit)
 			local time = ((endTime or 0) - (startTime or 0)) / 1000
 			return format("%s(%s) - %s - %ss [[%s]]", UnitName(unit), UnitName(unit.."target"), spellName, time, strjoin(":", tostringall(unit, spellName, ...)))
@@ -1841,7 +1869,7 @@ function Transcriptor:StopLog(silent)
 			print(L["Logs will probably be saved to WoW\\WTF\\Account\\<name>\\SavedVariables\\Transcriptor.lua once you relog or reload the user interface."])
 		end
 
-		if compareSuccess or compareStart or compareAuraApplied or compareUnitSuccess or compareEmotes then
+		if compareSuccess or compareStart or compareAuraApplied or compareUnitSuccess or compareUnitStart or compareEmotes then
 			currentLog.TIMERS = {}
 			if compareSuccess then
 				currentLog.TIMERS.SPELL_CAST_SUCCESS = {}
@@ -2076,7 +2104,7 @@ function Transcriptor:StopLog(silent)
 				currentLog.TIMERS.UNIT_SPELLCAST_SUCCEEDED = {}
 				for id,tbl in next, compareUnitSuccess do
 					for npcId, list in next, tbl do
-						if not compareSuccess or not compareSuccess[id] or not compareSuccess[id][npcId] then
+--						if not compareSuccess or not compareSuccess[id] or not compareSuccess[id][npcId] then
 							local n = format("%s-npc:%s", id, npcId)
 							local str
 							for i = 2, #list do
@@ -2139,10 +2167,82 @@ function Transcriptor:StopLog(silent)
 								end
 							end
 							currentLog.TIMERS.UNIT_SPELLCAST_SUCCEEDED[#currentLog.TIMERS.UNIT_SPELLCAST_SUCCEEDED+1] = str
-						end
+--						end
 					end
 				end
 				table.sort(currentLog.TIMERS.UNIT_SPELLCAST_SUCCEEDED)
+			end
+			if compareUnitStart then
+				currentLog.TIMERS.UNIT_SPELLCAST_START = {}
+				for id,tbl in next, compareUnitStart do
+					for npcId, list in next, tbl do
+--						if not compareStart or not compareStart[id] or not compareStart[id][npcId] then
+							local n = format("%s-npc:%s", id, npcId)
+							local str
+							for i = 2, #list do
+								if not str then
+									if type(list[1]) == "table" then
+										local sincePull = list[i] - list[1][1]
+										local sincePreviousEvent = list[i] - list[1][2]
+										local previousEventName = list[1][3]
+										str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+									else
+										local sincePull = list[i] - list[1]
+										str = format("%s = pull:%.1f", n, sincePull/1000)
+									end
+								else
+									if type(list[i]) == "table" then
+										if type(list[i-1]) == "number" then
+											local t = list[i][1]-list[i-1]
+											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+										elseif type(list[i-1]) == "table" then
+											local t = list[i][1]-list[i-1][1]
+											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+										else
+											str = format("%s, %s", str, list[i][2])
+										end
+									else
+										if type(list[i-1]) == "table" then
+											if type(list[i-2]) == "table" then
+												if type(list[i-3]) == "table" then
+													if type(list[i-4]) == "table" then
+														local counter = 5
+														while type(list[i-counter]) == "table" do
+															counter = counter + 1
+														end
+														local tStage = list[i] - list[i-1][1]
+														local t = list[i] - list[i-counter]
+														str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+													else
+														local tStage = list[i] - list[i-1][1]
+														local tStagePrevious = list[i] - list[i-2][1]
+														local tStagePreviousMore = list[i] - list[i-3][1]
+														local t = list[i] - list[i-4]
+														str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+													end
+												else
+													local tStage = list[i] - list[i-1][1]
+													local tStagePrevious = list[i] - list[i-2][1]
+													local t = list[i] - list[i-3]
+													str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+												end
+											else
+												local tStage = list[i] - list[i-1][1]
+												local t = list[i] - list[i-2]
+												str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+											end
+										else
+											local t = list[i] - list[i-1]
+											str = format("%s, %.1f", str, t/1000)
+										end
+									end
+								end
+							end
+							currentLog.TIMERS.UNIT_SPELLCAST_START[#currentLog.TIMERS.UNIT_SPELLCAST_START+1] = str
+--						end
+					end
+				end
+				table.sort(currentLog.TIMERS.UNIT_SPELLCAST_START)
 			end
 			if compareEmotes then
 				currentLog.TIMERS.EMOTES = {}
@@ -2247,6 +2347,7 @@ function Transcriptor:StopLog(silent)
 		compareUnitSuccess = nil
 		compareEmotes = nil
 		compareStart = nil
+		compareUnitStart = nil
 		compareAuraApplied = nil
 		compareStartTime = nil
 		collectPlayerAuras = nil
