@@ -1342,7 +1342,10 @@ local eventCategories = {
 	DBM_Debug = "DBM",
 	DBM_TimerStart = "DBM",
 	DBM_TimerStop = "DBM",
-	DBM_SetStage = "DBM",
+	DBM_SetStage = "COMBAT",
+	DBM_Pull = "COMBAT",
+	DBM_Kill = "COMBAT",
+	DBM_Wipe = "COMBAT",
 	PLAYER_TARGET_CHANGED = "NONE",
 	CHAT_MSG_ADDON = "NONE",
 	CHAT_MSG_RAID_WARNING = "NONE",
@@ -1362,6 +1365,8 @@ local dbmEvents = {
 	"DBM_TimerStop",
 	"DBM_SetStage",
 	"DBM_Pull",
+	"DBM_Kill",
+	"DBM_Wipe",
 }
 
 local function eventHandler(self, event, ...)
@@ -1376,17 +1381,29 @@ local function eventHandler(self, event, ...)
 	local stop = debugprofilestop() / 1000
 	local t = stop - logStartTime
 	local time = date("%H:%M:%S")
-	-- Use DBM StartCombat callback to emulate ENCOUNTER_START
-	if event == "DBM_Pull" then
-		compareStartTime = debugprofilestop()
-		wipe(data)
-	elseif event == "DBM_SetStage" then
-		local _, _, phase = ...
-		InsertSpecialEvent("Stage "..phase)
 	-- We only have CLEU in the total log, it's way too much information to log twice.
-	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		currentLog.total[#currentLog.total+1] = format("<%.2f %s> [CLEU] %s", t, time, line)
 	else
+		-- Use DBM StartCombat callback to emulate ENCOUNTER_START
+		if event == "DBM_Pull" then
+			compareStartTime = debugprofilestop()
+			wipe(data)
+			local mod, delay, synced, startHp = ...
+			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN, delay, synced, startHp))
+		elseif event == "DBM_SetStage" then
+			local _, modId, phase, totality = ...
+			InsertSpecialEvent("Stage "..phase)
+			line = strjoin("#", tostringall(modId, phase, totality))
+		-- Use DBM EndCombat callbacks to emulate BOSS_KILL & ENCOUNTER_END
+		elseif event == "DBM_Kill" then
+			local mod = ...
+			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN))
+		elseif event == "DBM_Wipe" then
+			local mod = ...
+			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN))
+		end
+
 		local text = format("<%.2f %s> [%s] %s", t, time, event, line)
 		currentLog.total[#currentLog.total+1] = text
 		local cat = eventCategories[event] or event
