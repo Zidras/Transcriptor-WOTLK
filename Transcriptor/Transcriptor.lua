@@ -1006,11 +1006,11 @@ do
 			if not compareUnitStart[spellName] then compareUnitStart[spellName] = {} end
 			local npcId = MobId(UnitGUID(unit), true)
 			if not compareUnitStart[spellName][npcId] then
---				if previousSpecialEvent then
---					compareUnitStart[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
---				else
+				if previousSpecialEvent then
+					compareUnitStart[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+				else
 					compareUnitStart[spellName][npcId] = {compareStartTime}
---				end
+				end
 			end
 			compareUnitStart[spellName][npcId][#compareUnitStart[spellName][npcId]+1] = debugprofilestop()
 
