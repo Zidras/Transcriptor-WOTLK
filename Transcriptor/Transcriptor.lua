@@ -76,7 +76,9 @@ end
 
 local function MobId(guid)
 	if not guid then return 1 end
-	return tonumber(guid:sub(9, 12), 16) or 1
+	local strId = tonumber(guid:sub(9, 12), 16) or 1
+	local uniq = tonumber(guid:sub(13), 16) or 1
+	return strId.."-"..uniq
 end
 
 local function InsertSpecialEvent(name)
