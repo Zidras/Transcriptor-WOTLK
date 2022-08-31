@@ -1765,9 +1765,12 @@ do
 		end
 	end
 
+	local transcriptorVersion = GetAddOnMetadata("Transcriptor", "Version")
+	local dbmRevision = DBM and format("%s (%s)", DBM.DisplayVersion, (DBM.ShowRealDate and DBM:ShowRealDate(DBM.Revision) or DBM.Revision)) or "No DBM"
 	local wowVersion, buildRevision = GetBuildInfo() -- Note that both returns here are strings, not numbers.
 	local realmName = GetRealmName()
-	local logNameFormat = "[%s]@[%s] - Zone:%d = %s/%s, Difficulty:%d (%s), Type:%s, " .. format("Version: %s.%s - Server: %s", wowVersion, buildRevision, realmName)
+	local playerName = UnitName("player")
+	local logNameFormat = "[%s]@[%s] - Zone:%d = %s/%s, Difficulty:%d (%s), Type:%s, " .. format("Transcriptor: %s, DBM: %s, Version: %s.%s - Player: %s | Server: %s", transcriptorVersion, dbmRevision, wowVersion, buildRevision, playerName, realmName)
 	function Transcriptor:StartLog(silent)
 		if logging then
 			print(L["You are already logging an encounter."])
