@@ -777,7 +777,7 @@ do
 				end
 				compareSummon[spellId][npcId][#compareSummon[spellId][npcId]+1] = debugprofilestop()
 			end
-			if event == "SPELL_AURA_APPLIED" and (not sourceName or (band(sourceFlags, mineOrPartyOrRaid) == 0 and not find(sourceGUID, "Player", nil, true))) then
+			if (event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_APPLIED_DOSE") and (not sourceName or (band(sourceFlags, mineOrPartyOrRaid) == 0 and not find(sourceGUID, "Player", nil, true))) then
 				if not compareAuraApplied then compareAuraApplied = {} end
 				if not compareAuraApplied[spellId] then compareAuraApplied[spellId] = {} end
 				local npcId = MobId(sourceGUID, true)
