@@ -1068,7 +1068,7 @@ do
 
 	function sh.UNIT_TARGET(unit)
 		if safeUnit(unit) then
-			return format("%s#%s#Target: %s#TargetOfTarget: %s", unit, tostring(UnitName(unit)), tostring(UnitName(unit.."target")), tostring(UnitName(unit.."targettarget")))
+			return format("-%s:%s- [CanAttack:%s#Exists:%s#IsVisible:%s#GUID:%s#Classification:%s#Health:%s] - Target: %s#TargetOfTarget: %s", tostringall(unit, UnitName(unit), UnitCanAttack("player", unit), UnitExists(unit), UnitIsVisible(unit), UnitGUID(unit), UnitClassification(unit), UnitHealth(unit), UnitName(unit.."target"), UnitName(unit.."targettarget")))
 		end
 	end
 end
@@ -1389,7 +1389,7 @@ local eventCategories = {
 	UNIT_SPELLCAST_INTERRUPTED = "UNIT_SPELLCAST",
 	UNIT_SPELLCAST_CHANNEL_START = "UNIT_SPELLCAST",
 	UNIT_SPELLCAST_CHANNEL_STOP = "UNIT_SPELLCAST",
-	UNIT_TARGET = "UNIT_SPELLCAST",
+	UNIT_TARGET = "COMBAT",
 	UNIT_ENERGY = "UNIT_POWER_UPDATE",
 	UNIT_FOCUS = "UNIT_POWER_UPDATE",
 	UNIT_HAPPINESS = "UNIT_POWER_UPDATE",
