@@ -76,11 +76,15 @@ do
 	end
 end
 
-local function MobId(guid)
+local function MobId(guid, extra)
 	if not guid then return 1 end
 	local strId = tonumber(guid:sub(9, 12), 16) or 1
-	local uniq = tonumber(guid:sub(13), 16) or 1
-	return strId.."-"..uniq
+	if extra then
+		local uniq = tonumber(guid:sub(13), 16) or 1
+		return strId.."-"..uniq
+	else
+		return strId
+	end
 end
 
 local function InsertSpecialEvent(name)
@@ -1068,7 +1072,7 @@ do
 
 	function sh.UNIT_TARGET(unit)
 		if safeUnit(unit) then
-			return format("-%s:%s- [CanAttack:%s#Exists:%s#IsVisible:%s#GUID:%s#Classification:%s#Health:%s] - Target: %s#TargetOfTarget: %s", tostringall(unit, UnitName(unit), UnitCanAttack("player", unit), UnitExists(unit), UnitIsVisible(unit), UnitGUID(unit), UnitClassification(unit), UnitHealth(unit), UnitName(unit.."target"), UnitName(unit.."targettarget")))
+			return format("-%s:%s- [CanAttack:%s#Exists:%s#IsVisible:%s#ID:%s#GUID:%s#Classification:%s#Health:%s] - Target: %s#TargetOfTarget: %s", tostringall(unit, UnitName(unit), UnitCanAttack("player", unit), UnitExists(unit), UnitIsVisible(unit), MobId(UnitGUID(unit)), UnitGUID(unit), UnitClassification(unit), UnitHealth(unit), UnitName(unit.."target"), UnitName(unit.."targettarget")))
 		end
 	end
 end
@@ -1089,11 +1093,11 @@ end
 
 function sh.INSTANCE_ENCOUNTER_ENGAGE_UNIT(...)
 	return strjoin("#", tostringall("Fake Args:",
-		"boss1", UnitCanAttack("player", "boss1"), UnitExists("boss1"), UnitIsVisible("boss1"), UnitName("boss1"), UnitGUID("boss1"), UnitClassification("boss1"), UnitHealth("boss1"),
-		"boss2", UnitCanAttack("player", "boss2"), UnitExists("boss2"), UnitIsVisible("boss2"), UnitName("boss2"), UnitGUID("boss2"), UnitClassification("boss2"), UnitHealth("boss2"),
-		"boss3", UnitCanAttack("player", "boss3"), UnitExists("boss3"), UnitIsVisible("boss3"), UnitName("boss3"), UnitGUID("boss3"), UnitClassification("boss3"), UnitHealth("boss3"),
-		"boss4", UnitCanAttack("player", "boss4"), UnitExists("boss4"), UnitIsVisible("boss4"), UnitName("boss4"), UnitGUID("boss4"), UnitClassification("boss4"), UnitHealth("boss4"),
-		"boss5", UnitCanAttack("player", "boss5"), UnitExists("boss5"), UnitIsVisible("boss5"), UnitName("boss5"), UnitGUID("boss5"), UnitClassification("boss5"), UnitHealth("boss5"),
+		"boss1", UnitCanAttack("player", "boss1"), UnitExists("boss1"), UnitIsVisible("boss1"), UnitName("boss1"), MobId(UnitGUID("boss1")), UnitGUID("boss1"), UnitClassification("boss1"), UnitHealth("boss1"),
+		"boss2", UnitCanAttack("player", "boss2"), UnitExists("boss2"), UnitIsVisible("boss2"), UnitName("boss2"), MobId(UnitGUID("boss2")), UnitGUID("boss2"), UnitClassification("boss2"), UnitHealth("boss2"),
+		"boss3", UnitCanAttack("player", "boss3"), UnitExists("boss3"), UnitIsVisible("boss3"), UnitName("boss3"), MobId(UnitGUID("boss3")), UnitGUID("boss3"), UnitClassification("boss3"), UnitHealth("boss3"),
+		"boss4", UnitCanAttack("player", "boss4"), UnitExists("boss4"), UnitIsVisible("boss4"), UnitName("boss4"), MobId(UnitGUID("boss4")), UnitGUID("boss4"), UnitClassification("boss4"), UnitHealth("boss4"),
+		"boss5", UnitCanAttack("player", "boss5"), UnitExists("boss5"), UnitIsVisible("boss5"), UnitName("boss5"), MobId(UnitGUID("boss5")), UnitGUID("boss5"), UnitClassification("boss5"), UnitHealth("boss5"),
 		"Real Args:", ...)
 	)
 end
