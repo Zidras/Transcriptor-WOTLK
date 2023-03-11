@@ -55,7 +55,7 @@ local debugprofilestop, wipe = debugprofilestop, wipe
 local IsAltKeyDown, GetMapInfo = IsAltKeyDown, GetMapInfo
 local UnitInRaid, UnitInParty, UnitIsFriend, UnitCastingInfo, UnitChannelInfo = UnitInRaid, UnitInParty, UnitIsFriend, UnitCastingInfo, UnitChannelInfo
 local UnitCanAttack, UnitExists, UnitIsVisible, UnitGUID, UnitClassification = UnitCanAttack, UnitExists, UnitIsVisible, UnitGUID, UnitClassification
-local UnitName, UnitPower, UnitPowerMax, UnitPowerType, UnitHealth = UnitName, UnitPower, UnitPowerMax, UnitPowerType, UnitHealth
+local UnitName, UnitPower, UnitPowerMax, UnitPowerType, UnitHealth, UnitHealthMax = UnitName, UnitPower, UnitPowerMax, UnitPowerType, UnitHealth, UnitHealthMax
 local UnitLevel, UnitCreatureType = UnitLevel, UnitCreatureType
 local GetInstanceInfo, GetCurrentMapAreaID = GetInstanceInfo, GetCurrentMapAreaID
 local GetZoneText, GetRealZoneText, GetSubZoneText, GetSpellInfo = GetZoneText, GetRealZoneText, GetSubZoneText, GetSpellInfo
@@ -983,7 +983,11 @@ do
 
 	function sh.UNIT_SPELLCAST_STOP(unit, spellName, ...)
 		if safeUnit(unit) then
-			return format("%s(%s) -%s- [[%s]]", UnitName(unit), UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
+			local maxHP = UnitHealthMax(unit)
+			local maxPower = UnitPowerMax(unit)
+			local hp = maxHP == 0 and maxHP or (UnitHealth(unit) / maxHP * 100)
+			local power = maxPower == 0 and maxPower or (UnitPower(unit) / maxPower * 100)
+			return format("%s(%.1f%%-%.1f%%){Target:%s} -%s- [[%s]]", UnitName(unit), hp, power, UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
 		end
 	end
 	sh.UNIT_SPELLCAST_CHANNEL_STOP = sh.UNIT_SPELLCAST_STOP
@@ -997,7 +1001,11 @@ do
 				end
 			end
 
-			return format("%s(%s) -%s- [[%s]]", UnitName(unit), UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
+			local maxHP = UnitHealthMax(unit)
+			local maxPower = UnitPowerMax(unit)
+			local hp = maxHP == 0 and maxHP or (UnitHealth(unit) / maxHP * 100)
+			local power = maxPower == 0 and maxPower or (UnitPower(unit) / maxPower * 100)
+			return format("%s(%.1f%%-%.1f%%){Target:%s} -%s- [[%s]]", UnitName(unit), hp, power, UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
 		end
 	end
 
@@ -1027,12 +1035,16 @@ do
 				end
 			--end
 
-			return format("%s(%s) -%s- [[%s]]", UnitName(unit), UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
+			local maxHP = UnitHealthMax(unit)
+			local maxPower = UnitPowerMax(unit)
+			local hp = maxHP == 0 and maxHP or (UnitHealth(unit) / maxHP * 100)
+			local power = maxPower == 0 and maxPower or (UnitPower(unit) / maxPower * 100)
+			return format("%s(%.1f%%-%.1f%%){Target:%s} -%s- [[%s]]", UnitName(unit), hp, power, UnitName(unit.."target"), spellName, strjoin(":", tostringall(unit, spellName, ...)))
 		--elseif raidList[unit] and not playerSpellBlacklist[spellId] then
 		--	if not playerSpellCollector[spellId] then
 		--		playerSpellCollector[spellId] = strjoin("#", tostringall(spellId, GetSpellInfo(spellId), unit, UnitName(unit)))
 		--	end
-		--	return format("PLAYER_SPELL(%s) -%s- [[%s]]", UnitName(unit), GetSpellInfo(spellId), strjoin(":", tostringall(unit, castId, spellId, ...)))
+		--	return format("PLAYER_SPELL{%s} -%s- [[%s]]", UnitName(unit), GetSpellInfo(spellId), strjoin(":", tostringall(unit, castId, spellId, ...)))
 		end
 	end
 	function sh.UNIT_SPELLCAST_START(unit, spellName, ...)
@@ -1059,14 +1071,22 @@ do
 
 			local _, _, _, _, startTime, endTime = UnitCastingInfo(unit)
 			local time = ((endTime or 0) - (startTime or 0)) / 1000
-			return format("%s(%s) - %s - %ss [[%s]]", UnitName(unit), UnitName(unit.."target"), spellName, time, strjoin(":", tostringall(unit, spellName, ...)))
+			local maxHP = UnitHealthMax(unit)
+			local maxPower = UnitPowerMax(unit)
+			local hp = maxHP == 0 and maxHP or (UnitHealth(unit) / maxHP * 100)
+			local power = maxPower == 0 and maxPower or (UnitPower(unit) / maxPower * 100)
+			return format("%s(%.1f%%-%.1f%%){Target:%s} -%s- %ss [[%s]]", UnitName(unit), hp, power, UnitName(unit.."target"), spellName, time, strjoin(":", tostringall(unit, spellName, ...)))
 		end
 	end
 	function sh.UNIT_SPELLCAST_CHANNEL_START(unit, spellName, ...)
 		if safeUnit(unit) then
 			local _, _, _, _, startTime, endTime = UnitChannelInfo(unit)
 			local time = ((endTime or 0) - (startTime or 0)) / 1000
-			return format("%s(%s) - %s - %ss [[%s]]", UnitName(unit), UnitName(unit.."target"),spellName, time, strjoin(":", tostringall(unit, spellName, ...)))
+			local maxHP = UnitHealthMax(unit)
+			local maxPower = UnitPowerMax(unit)
+			local hp = maxHP == 0 and maxHP or (UnitHealth(unit) / maxHP * 100)
+			local power = maxPower == 0 and maxPower or (UnitPower(unit) / maxPower * 100)
+			return format("%s(%.1f%%-%.1f%%){Target:%s} -%s- %ss [[%s]]", UnitName(unit), hp, power, UnitName(unit.."target"), spellName, time, strjoin(":", tostringall(unit, spellName, ...)))
 		end
 	end
 
