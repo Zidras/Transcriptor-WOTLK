@@ -1470,9 +1470,9 @@ local function eventHandler(self, event, ...)
 	else
 		-- Use DBM StartCombat callback to emulate ENCOUNTER_START
 		if event == "DBM_Pull" then
-			compareStartTime = debugprofilestop()
-			wipe(data)
 			local mod, delay, synced, startHp = ...
+			compareStartTime = debugprofilestop() - (delay * 1000)
+			wipe(data)
 			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN, delay, synced, startHp))
 		elseif event == "DBM_SetStage" then
 			local _, modId, phase, totality = ...
