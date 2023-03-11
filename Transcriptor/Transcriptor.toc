@@ -23,6 +23,7 @@ libs\CallbackHandler-1.0.lua
 libs\LibDataBroker-1.1.lua
 libs\LibDBIcon-1.0.lua
 
-SpellBlacklist.lua
-SpecialEvents.lua
+Modules\PlayerSpellBlocklist.lua
+Modules\TimersBlocklist.lua
+Modules\TimersSpecialEvents.lua
 Transcriptor.lua

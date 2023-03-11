@@ -1,12 +1,13 @@
-local tbl
+local addonTbl
+local dataTbl = {}
 do
 	local _
-	_, tbl = ...
+	_, addonTbl = ...
+	addonTbl.TIMERS_SPECIAL_EVENTS_DATA = dataTbl
 end
 
---local GetSpellInfo = GetSpellInfo
-
-tbl.specialEvents = {
+-- Insert special events into
+addonTbl.TIMERS_SPECIAL_EVENTS = {
 	["UNIT_SPELLCAST_SUCCEEDED"] = {
 		-- [[ Icecrown Citadel ]] --
 --[[
@@ -30,10 +31,10 @@ tbl.specialEvents = {
 		[71615] = { -- Tear Gas Removal (normal)
 			[36678] = function() -- Professor Putricide
 				local t = GetTime()
-				if t - (tbl.data[1] or 0) > 5 then -- only trigger for the first Tear Gas Removal in this time window
-					tbl.data[1] = t
-					tbl.data[2] = (tbl.data[2] or 1) + 1
-					return "Stage ".. tbl.data[2]
+				if t - (dataTbl[1] or 0) > 5 then -- only trigger for the first Tear Gas Removal in this time window
+					dataTbl[1] = t
+					dataTbl[2] = (dataTbl[2] or 1) + 1
+					return "Stage ".. dataTbl[2]
 				end
 			end,
 		},
