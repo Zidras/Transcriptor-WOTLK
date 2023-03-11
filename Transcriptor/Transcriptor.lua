@@ -43,18 +43,17 @@ local shouldLogFlags = false
 local mineOrPartyOrRaid = 7 -- COMBATLOG_OBJECT_AFFILIATION_MINE + COMBATLOG_OBJECT_AFFILIATION_PARTY + COMBATLOG_OBJECT_AFFILIATION_RAID
 
 local band = bit.band
-local tinsert = table.insert
-local format, find = string.format, string.find
+local tinsert, tsort, twipe, tconcat = table.insert, table.sort, table.wipe, table.concat
+local format, find, strsplit, gsub, strmatch = string.format, string.find, strsplit, string.gsub, string.match
 local strjoin -- defined later since wow API errors with nil values
-local tostring, tostringall = tostring, tostringall
+local tostring, tostringall, date = tostring, tostringall, date
 local type, next, print = type, next, print
-local date = date
-local debugprofilestop, wipe = debugprofilestop, table.wipe
+local debugprofilestop = debugprofilestop
 
 --local C_Scenario, C_DeathInfo_GetSelfResurrectOptions, Enum = C_Scenario, C_DeathInfo.GetSelfResurrectOptions, Enum
 --local IsEncounterInProgress, IsEncounterLimitingResurrections, IsEncounterSuppressingRelease = IsEncounterInProgress, IsEncounterLimitingResurrections, IsEncounterSuppressingRelease
 --local IsAltKeyDown, EJ_GetEncounterInfo, C_EncounterJournal_GetSectionInfo, C_Map_GetMapInfo = IsAltKeyDown, EJ_GetEncounterInfo, C_EncounterJournal.GetSectionInfo, C_Map.GetMapInfo
-local IsAltKeyDown, GetMapInfo = IsAltKeyDown, GetMapInfo
+local IsAltKeyDown = IsAltKeyDown
 local UnitInRaid, UnitInParty, UnitIsFriend, UnitCastingInfo, UnitChannelInfo = UnitInRaid, UnitInParty, UnitIsFriend, UnitCastingInfo, UnitChannelInfo
 local UnitCanAttack, UnitExists, UnitIsVisible, UnitGUID, UnitClassification = UnitCanAttack, UnitExists, UnitIsVisible, UnitGUID, UnitClassification
 local UnitName, UnitPower, UnitPowerMax, UnitPowerType, UnitHealth, UnitHealthMax = UnitName, UnitPower, UnitPowerMax, UnitPowerType, UnitHealth, UnitHealthMax
@@ -97,57 +96,57 @@ local function InsertSpecialEvent(name)
 	local t = debugprofilestop()
 	previousSpecialEvent = {t, name}
 	if compareSuccess then
-		for id,tbl in next, compareSuccess do
-			for npcId, list in next, tbl do
+		for _,tbl in next, compareSuccess do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
 	end
 	if compareStart then
-		for id,tbl in next, compareStart do
-			for npcId, list in next, tbl do
+		for _,tbl in next, compareStart do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
 	end
 	if compareSummon then
-		for id,tbl in next, compareSummon do
-			for npcId, list in next, tbl do
+		for _,tbl in next, compareSummon do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
 	end
 	if compareAuraApplied then
-		for id,tbl in next, compareAuraApplied do
-			for npcId, list in next, tbl do
+		for _,tbl in next, compareAuraApplied do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
 	end
 	if compareUnitSuccess then
-		for id,tbl in next, compareUnitSuccess do
-			for npcId, list in next, tbl do
+		for _,tbl in next, compareUnitSuccess do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
 	end
 	if compareUnitStart then
-		for id,tbl in next, compareUnitStart do
-			for npcId, list in next, tbl do
+		for _,tbl in next, compareUnitStart do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
 	end
 	if compareEmotes then
-		for id,tbl in next, compareEmotes do
-			for npcName, list in next, tbl do
+		for _,tbl in next, compareEmotes do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
 	end
 	if compareYells then
-		for id,tbl in next, compareYells do
-			for npcName, list in next, tbl do
+		for _,tbl in next, compareYells do
+			for _, list in next, tbl do
 				list[#list+1] = {t, name}
 			end
 		end
@@ -208,9 +207,8 @@ end]]
 
 do
 
-	--[[local function onHyperlinkLeave(self, data, link)
+	--[[local function onHyperlinkLeave()
 		GameTooltip:Hide()
-		updateFrame:SetScript("OnUpdate", nil)
 	end]]
 	-- Create UI spell display, copied from BasicChatMods
 	local frame, editBox = {}, {}
@@ -241,9 +239,9 @@ do
 		editBox[i]:SetScript("OnEscapePressed", function(f) f:GetParent():GetParent():Hide() f:SetText("") end)
 		--[[if i % 2 ~= 0 then
 			editBox[i]:SetScript("OnHyperlinkLeave", onHyperlinkLeave)
-			editBox[i]:SetScript("OnHyperlinkEnter", function(self, link, text)
+			editBox[i]:SetScript("OnHyperlinkEnter", function(_, link)
 				if link and find(link, "spell", nil, true) then
-					local spellId = link:match("(%d+)")
+					local spellId = strmatch(link, "(%d+)")
 					if spellId then
 						GameTooltip:SetOwner(frame[i], "ANCHOR_LEFT", 0, -500)
 						GameTooltip:SetSpellByID(spellId)
@@ -304,9 +302,9 @@ do
 			[150202] = true, -- Waveblade Hunter]]
 		}
 		local events = {
-			"SPELL_AURA_[AR][^#]+#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#([^#]+)#", -- SPELL_AURA_[AR] to filter _BROKEN
-			"SPELL_CAST_[^#]+#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#([^#]+)#",
-			"SPELL_SUMMON#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#([^#]+)#"
+			"SPELL_AURA_[AR][^#]+#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#", -- SPELL_AURA_[AR] to filter _BROKEN
+			"SPELL_CAST_[^#]+#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#",
+			"SPELL_SUMMON#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#"
 		}
 		local tables = {
 			auraTbl,
@@ -318,33 +316,39 @@ do
 			castsSorted,
 			summonSorted,
 		}
-		for logName, logTbl in next, TranscriptDB do
+		for _, logTbl in next, TranscriptDB do
 			if type(logTbl) == "table" then
 				if logTbl.total then
 					for i=1, #logTbl.total do
 						local text = logTbl.total[i]
 
 						for j = 1, 3 do
-							local flagsText, srcGUID, name, destGUID, tarName, idText = text:match(events[j])
-							local id = tonumber(idText)
+							local flagsText, srcGUID, srcName, destGUID, destName, idText = strmatch(text, events[j])
+							local spellId = tonumber(idText)
 							local flags = tonumber(flagsText)
 							local tbl = tables[j]
 							local sortedTbl = sortedTables[j]
-							if id and flags and band(flags, mineOrPartyOrRaid) ~= 0 and not ignoreList[id] and not PLAYER_SPELL_BLOCKLIST[id] and #sortedTbl < 15 then -- Check total to avoid duplicates and lock to a max of 15 for sanity
-								if not total[id] or destGUID ~= "" then
+							if spellId and flags and band(flags, mineOrPartyOrRaid) ~= 0 and not ignoreList[spellId] and not PLAYER_SPELL_BLOCKLIST[spellId] and #sortedTbl < 15 then -- Check total to avoid duplicates and lock to a max of 15 for sanity
+								if not total[spellId] or destGUID ~= "" then
 									local srcGUIDType, _, _, _, _, npcIdStr = strsplit("-", srcGUID)
 									local npcId = tonumber(npcIdStr)
 									if not npcIgnoreList[npcId] then
 										local destGUIDType = strsplit("-", destGUID)
-										local trim = destGUID and find(destGUID, "^P[le][at]")
-										if srcGUID == destGUID then
-											tbl[id] = "|cFF81BEF7".. name:gsub("%-.+", "*") .."(".. srcGUIDType ..") >> ".. (trim and tarName:gsub("%-.+", "*") or tarName) .."(".. destGUIDType ..")|r"
-										else
-											tbl[id] = "|cFF3ADF00".. name:gsub("%-.+", "*") .."(".. srcGUIDType ..") >> ".. (trim and tarName:gsub("%-.+", "*") or tarName) .."(".. destGUIDType ..")|r"
+										if find(destGUID, "^P[le][at]") then -- Only players/pets, don't remove "-" from NPC names
+											destName = gsub(destName, "%-.+", "*") -- Replace server name with *
 										end
-										if not total[id] then
-											total[id] = true
-											sortedTbl[#sortedTbl+1] = id
+										if find(srcGUID, "^P[le][at]") then-- Only players/pets, don't remove "-" from NPCs names
+											srcName = gsub(srcName, "%-.+", "*") -- Replace server name with *
+										end
+										srcName = gsub(srcName, "%(.+", "") -- Remove health/mana
+										if srcGUID == destGUID then
+											tbl[spellId] = "|cFF81BEF7".. srcName .."(".. srcGUIDType ..") >> ".. destName .."(".. destGUIDType ..")|r"
+										else
+											tbl[spellId] = "|cFF3ADF00".. srcName .."(".. srcGUIDType ..") >> ".. destName .."(".. destGUIDType ..")|r"
+										end
+										if not total[spellId] then
+											total[spellId] = true
+											sortedTbl[#sortedTbl+1] = spellId
 										end
 									end
 								end
@@ -366,7 +370,7 @@ do
 			end
 		end
 
-		sort(aurasSorted)
+		tsort(aurasSorted)
 		local text = "-- AURAS\n"
 		for i = 1, #aurasSorted do
 			local id = aurasSorted[i]
@@ -374,7 +378,7 @@ do
 			text = format("%s%d || |cFFFFFF00|Hspell:%d|h%s|h|r || %s\n", text, id, id, name, auraTbl[id])
 		end
 
-		sort(castsSorted)
+		tsort(castsSorted)
 		text = text.. "\n-- CASTS\n"
 		for i = 1, #castsSorted do
 			local id = castsSorted[i]
@@ -382,7 +386,7 @@ do
 			text = format("%s%d || |cFFFFFF00|Hspell:%d|h%s|h|r || %s\n", text, id, id, name, castTbl[id])
 		end
 
-		sort(summonSorted)
+		tsort(summonSorted)
 		text = text.. "\n-- SUMMONS\n"
 		for i = 1, #summonSorted do
 			local id = summonSorted[i]
@@ -402,15 +406,15 @@ do
 		frame[1]:SetPoint("BOTTOMRIGHT", UIParent, "CENTER")
 		frame[1]:Show()
 
-		for k, v in next, PLAYER_SPELL_BLOCKLIST do
+		for k in next, PLAYER_SPELL_BLOCKLIST do
 			if GetSpellInfo(k) then -- Filter out removed spells when a new patch hits
 				total[k] = true
 			end
 		end
-		for k, v in next, total do
+		for k in next, total do
 			totalSorted[#totalSorted+1] = k
 		end
-		sort(totalSorted)
+		tsort(totalSorted)
 		local exportText = "local addonTbl\ndo\n\tlocal _\n\t_, addonTbl = ...\nend\n\n"
 		exportText = exportText .."-- Block specific player spells from appearing in the logs.\n"
 		exportText = exportText .."-- This list is generated in game and there is not much point filling it in manually.\naddonTbl.PLAYER_SPELL_BLOCKLIST = {\n"
@@ -469,9 +473,9 @@ do
 			[233901] = true, -- Suffocating Dark]]
 		}
 		local eventsNoSource = {
-			"SPELL_AURA_[AR][^#]+#(%d+)##([^#]+)#([^#]+%-[^#]+)#([^#]+)#(%d+)#([^#]+)#", -- SPELL_AURA_[AR] to filter _BROKEN
-			"SPELL_CAST_[^#]+#(%d+)##([^#]+)#([^#]+%-[^#]+)#([^#]+)#(%d+)#([^#]+)#",
-			"SPELL_SUMMON#(%d+)##([^#]+)#([^#]+%-[^#]+)#([^#]+)#(%d+)#([^#]+)#"
+			"SPELL_AURA_[AR][^#]+#(%d+)##([^#]+)#([^#]+%-[^#]+)#([^#]+)#(%d+)#[^#]+#", -- SPELL_AURA_[AR] to filter _BROKEN
+			"SPELL_CAST_[^#]+#(%d+)##([^#]+)#([^#]+%-[^#]+)#([^#]+)#(%d+)#[^#]+#",
+			"SPELL_SUMMON#(%d+)##([^#]+)#([^#]+%-[^#]+)#([^#]+)#(%d+)#[^#]+#"
 		}
 		tables = {
 			auraTbl,
@@ -483,28 +487,32 @@ do
 			castsSorted,
 			summonSorted,
 		}
-		for logName, logTbl in next, TranscriptDB do
+		for _, logTbl in next, TranscriptDB do
 			if type(logTbl) == "table" and logTbl.total then
 				for i=1, #logTbl.total do
-					local text = logTbl.total[i]
+					local logEntry = logTbl.total[i]
 
 					for j = 1, 3 do
-						local flagsText, name, destGUID, tarName, idText = text:match(eventsNoSource[j])
-						local id = tonumber(idText)
-						local flags = tonumber(flagsText)
+						local flagsText, srcName, destGUID, destName, idText = strmatch(logEntry, eventsNoSource[j])
+						local spellId = tonumber(idText)
+						local srcFlags = tonumber(flagsText)
 						local tbl = tables[j]
 						local sortedTbl = sortedTables[j]
-						if name == "nil" and id and flags and band(flags, mineOrPartyOrRaid) ~= 0 and not ignoreList[id] and not badSourcelessPlayerSpellList[id] and not total[id] and #sortedTbl < 15 then -- Check total to avoid duplicates and lock to a max of 15 for sanity
-							tbl[id] = tarName:gsub("%-.+", "*")
-							total[id] = true
-							sortedTbl[#sortedTbl+1] = id
+						if srcName == "nil" and spellId and srcFlags and band(srcFlags, mineOrPartyOrRaid) ~= 0 and not ignoreList[spellId] and not badSourcelessPlayerSpellList[spellId] and not total[spellId] and #sortedTbl < 15 then -- Check total to avoid duplicates and lock to a max of 15 for sanity
+							if find(destGUID, "^P[le][at]") then -- Only players/pets, don't remove "-" from NPC names
+								tbl[spellId] = gsub(destName, "%-.+", "*") -- Replace server name with *
+							else
+								tbl[spellId] = destName
+							end
+							total[spellId] = true
+							sortedTbl[#sortedTbl+1] = spellId
 						end
 					end
 				end
 			end
 		end
 
-		sort(aurasSorted)
+		tsort(aurasSorted)
 		text = "-- AURAS\n"
 		for i = 1, #aurasSorted do
 			local id = aurasSorted[i]
@@ -512,7 +520,7 @@ do
 			text = format("%s%d || |cFFFFFF00|Hspell:%d|h%s|h|r || %s\n", text, id, id, name, auraTbl[id])
 		end
 
-		sort(castsSorted)
+		tsort(castsSorted)
 		text = text.. "\n-- CASTS\n"
 		for i = 1, #castsSorted do
 			local id = castsSorted[i]
@@ -520,7 +528,7 @@ do
 			text = format("%s%d || |cFFFFFF00|Hspell:%d|h%s|h|r || %s\n", text, id, id, name, castTbl[id])
 		end
 
-		sort(summonSorted)
+		tsort(summonSorted)
 		text = text.. "\n-- SUMMONS\n"
 		for i = 1, #summonSorted do
 			local id = summonSorted[i]
@@ -534,13 +542,13 @@ do
 		frame[3]:SetPoint("TOPRIGHT", UIParent, "CENTER")
 		frame[3]:Show()
 
-		for k, v in next, badSourcelessPlayerSpellList do
+		for k in next, badSourcelessPlayerSpellList do
 			total[k] = true
 		end
-		for k, v in next, total do
+		for k in next, total do
 			totalSorted[#totalSorted+1] = k
 		end
-		sort(totalSorted)
+		tsort(totalSorted)
 		text = ""
 		for i = 1, #totalSorted do
 			local id = totalSorted[i]
@@ -554,7 +562,7 @@ do
 		frame[4]:SetPoint("TOPLEFT", UIParent, "CENTER")
 		frame[4]:Show()
 	end
-	SlashCmdList["GETSPELLS"] = GetLogSpells
+	SlashCmdList.GETSPELLS = GetLogSpells
 	SLASH_GETSPELLS1 = "/getspells"
 end
 
@@ -718,7 +726,7 @@ do
 	}
 	local badEvents = {
 		--["SPELL_ABSORBED"] = true,
-		["SPELL_CAST_FAILED"] = true
+		["SPELL_CAST_FAILED"] = true,
 	}
 	local guardian = 8192 -- COMBATLOG_OBJECT_TYPE_GUARDIAN
 	local dmgCache, dmgPrdcCache = {}, {}
@@ -1087,6 +1095,7 @@ do
 		if safeUnit(unit) then
 			local _, _, _, _, startTime, endTime = UnitChannelInfo(unit)
 			local time = ((endTime or 0) - (startTime or 0)) / 1000
+
 			local maxHP = UnitHealthMax(unit)
 			local maxPower = UnitPowerMax(unit)
 			local hp = maxHP == 0 and maxHP or (UnitHealth(unit) / maxHP * 100)
@@ -1242,12 +1251,12 @@ end
 
 --[[function sh.ENCOUNTER_START(...)
 	compareStartTime = debugprofilestop()
-	wipe(TIMERS_SPECIAL_EVENTS_DATA)
+	twipe(TIMERS_SPECIAL_EVENTS_DATA)
 	return strjoin("#", ...)
 end]]
 
 function sh.CHAT_MSG_RAID_BOSS_EMOTE(msg, npcName, ...)
-	local id = msg:match("|Hspell:([^|]+)|h")
+	local id = strmatch(msg, "|Hspell:([^|]+)|h")
 	if msg then
 		local spellId = id and tonumber(id) or msg -- aggregate emotes by its spellId (only seen it in one WotLK private server, so also aggregate by msg)
 		if spellId then
@@ -1267,7 +1276,7 @@ function sh.CHAT_MSG_RAID_BOSS_EMOTE(msg, npcName, ...)
 end
 
 function sh.CHAT_MSG_MONSTER_YELL(msg, npcName, ...)
-	local id = msg:match("|Hspell:([^|]+)|h")
+	local id = strmatch(msg, "|Hspell:([^|]+)|h")
 	if msg then
 		local spellId = id and tonumber(id) or msg -- aggregate emotes by its spellId (only seen it in one WotLK private server, so also aggregate by msg)
 		if spellId then
@@ -1477,7 +1486,7 @@ local dbmEvents = {
 	"DBM_Wipe",
 }
 
-local function eventHandler(self, event, ...)
+local function eventHandler(_, event, ...)
 	if TranscriptIgnore[event] then return end
 	local line
 	if sh[event] then
@@ -1497,7 +1506,7 @@ local function eventHandler(self, event, ...)
 		if event == "DBM_Pull" then
 			local mod, delay, synced, startHp = ...
 			compareStartTime = debugprofilestop() - (delay * 1000)
-			wipe(TIMERS_SPECIAL_EVENTS_DATA)
+			twipe(TIMERS_SPECIAL_EVENTS_DATA)
 			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN, delay, synced, startHp))
 		elseif event == "DBM_SetStage" then
 			local _, modId, phase, totality = ...
@@ -1632,7 +1641,7 @@ local ldb = LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("Transcriptor"
 
 Transcriptor.events = {}
 local function insertMenuItems(tbl)
-	for i, v in next, tbl do
+	for _, v in next, tbl do
 		tinsert(menu, {
 			text = v,
 			func = function() TranscriptIgnore[v] = not TranscriptIgnore[v] end,
@@ -1712,7 +1721,6 @@ do
 		"raid31", "raid32", "raid33", "raid34", "raid35", "raid36", "raid37", "raid38", "raid39", "raid40"
 	}
 	local partyList = {"player", "party1", "party2", "party3", "party4"}
-
 	local GetNumRaidMembers, GetNumPartyMembers = GetNumRaidMembers, GetNumPartyMembers
 
 	local function IsInRaid()
@@ -1828,7 +1836,7 @@ do
 			ldb.text = L["|cffFF0000Recording|r"]
 			ldb.icon = "Interface\\AddOns\\Transcriptor\\icon_on"
 			shouldLogFlags = TranscriptIgnore.logFlags and true or false
-			wipe(TIMERS_SPECIAL_EVENTS_DATA)
+			twipe(TIMERS_SPECIAL_EVENTS_DATA)
 
 			hiddenAuraEngageList = {}
 			--[[do
@@ -1867,20 +1875,23 @@ do
 			if type(currentLog.total) ~= "table" then currentLog.total = {} end
 			--Register Events to be Tracked
 			eventFrame:Show()
-			for i, event in next, wowEvents do
+			for i = 1, #wowEvents do
+				local event = wowEvents[i]
 				if not TranscriptIgnore[event] then
 					eventFrame:RegisterEvent(event)
 				end
 			end
 			if BigWigsLoader then
-				for i, event in next, bwEvents do
+				for i = 1, #bwEvents do
+					local event = bwEvents[i]
 					if not TranscriptIgnore[event] then
 						BigWigsLoader.RegisterMessage(eventFrame, event, BWEventHandler)
 					end
 				end
 			end
 			if DBM then
-				for i, event in next, dbmEvents do
+				for i = 1, #dbmEvents do
+					local event = dbmEvents[i]
 					if not TranscriptIgnore[event] then
 						DBM:RegisterCallback(event, DBMEventHandler)
 					end
@@ -1933,7 +1944,8 @@ function Transcriptor:StopLog(silent)
 
 		--Clear Events
 		eventFrame:Hide()
-		for i, event in next, wowEvents do
+		for i = 1, #wowEvents do
+			local event = wowEvents[i]
 			if not TranscriptIgnore[event] then
 				eventFrame:UnregisterEvent(event)
 			end
@@ -1942,7 +1954,8 @@ function Transcriptor:StopLog(silent)
 			BigWigsLoader.SendMessage(eventFrame, "BigWigs_OnPluginDisable", eventFrame)
 		end
 		if DBM and DBM.UnregisterCallback then
-			for i, event in next, dbmEvents do
+			for i = 1, #dbmEvents do
+				local event = dbmEvents[i]
 				DBM:UnregisterCallback(event, DBMEventHandler)
 			end
 		end
@@ -2025,7 +2038,7 @@ function Transcriptor:StopLog(silent)
 						end
 					end
 				end
-				table.sort(currentLog.TIMERS.SPELL_CAST_SUCCESS)
+				tsort(currentLog.TIMERS.SPELL_CAST_SUCCESS)
 			end
 			if compareStart then
 				currentLog.TIMERS.SPELL_CAST_START = {}
@@ -2098,7 +2111,7 @@ function Transcriptor:StopLog(silent)
 						end
 					end
 				end
-				table.sort(currentLog.TIMERS.SPELL_CAST_START)
+				tsort(currentLog.TIMERS.SPELL_CAST_START)
 			end
 			if compareSummon then
 				currentLog.TIMERS.SPELL_SUMMON = {}
@@ -2171,7 +2184,7 @@ function Transcriptor:StopLog(silent)
 						end
 					end
 				end
-				table.sort(currentLog.TIMERS.SPELL_SUMMON)
+				tsort(currentLog.TIMERS.SPELL_SUMMON)
 			end
 			if compareAuraApplied then
 				currentLog.TIMERS.SPELL_AURA_APPLIED = {}
@@ -2263,7 +2276,7 @@ function Transcriptor:StopLog(silent)
 						end
 					end
 				end
-				table.sort(currentLog.TIMERS.SPELL_AURA_APPLIED)
+				tsort(currentLog.TIMERS.SPELL_AURA_APPLIED)
 			end
 			if compareUnitSuccess then
 				currentLog.TIMERS.UNIT_SPELLCAST_SUCCEEDED = {}
@@ -2335,7 +2348,7 @@ function Transcriptor:StopLog(silent)
 --						end
 					end
 				end
-				table.sort(currentLog.TIMERS.UNIT_SPELLCAST_SUCCEEDED)
+				tsort(currentLog.TIMERS.UNIT_SPELLCAST_SUCCEEDED)
 			end
 			if compareUnitStart then
 				currentLog.TIMERS.UNIT_SPELLCAST_START = {}
@@ -2407,7 +2420,7 @@ function Transcriptor:StopLog(silent)
 --						end
 					end
 				end
-				table.sort(currentLog.TIMERS.UNIT_SPELLCAST_START)
+				tsort(currentLog.TIMERS.UNIT_SPELLCAST_START)
 			end
 			if compareEmotes then
 				currentLog.TIMERS.EMOTES = {}
@@ -2478,7 +2491,7 @@ function Transcriptor:StopLog(silent)
 						currentLog.TIMERS.EMOTES[#currentLog.TIMERS.EMOTES+1] = str
 					end
 				end
-				table.sort(currentLog.TIMERS.EMOTES)
+				tsort(currentLog.TIMERS.EMOTES)
 			end
 			if compareYells then
 				currentLog.TIMERS.YELLS = {}
@@ -2549,7 +2562,7 @@ function Transcriptor:StopLog(silent)
 						currentLog.TIMERS.YELLS[#currentLog.TIMERS.YELLS+1] = str
 					end
 				end
-				table.sort(currentLog.TIMERS.YELLS)
+				tsort(currentLog.TIMERS.YELLS)
 			end
 		end
 		if collectPlayerAuras then

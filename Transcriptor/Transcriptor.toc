@@ -18,10 +18,10 @@
 ## X-Curse-Project-ID: 14837
 ## SavedVariables: TranscriptIgnore, TranscriptDB, TranscriptOptions
 
-libs\LibStub.lua
-libs\CallbackHandler-1.0.lua
-libs\LibDataBroker-1.1.lua
-libs\LibDBIcon-1.0.lua
+Libs\LibStub.lua
+Libs\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0.lua
 
 Modules\PlayerSpellBlocklist.lua
 Modules\TimersBlocklist.lua
