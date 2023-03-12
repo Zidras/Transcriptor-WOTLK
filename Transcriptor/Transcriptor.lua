@@ -1972,7 +1972,7 @@ function Transcriptor:StopLog(silent)
 				for spellId,tbl in next, compareSuccess do
 					for npcPartialGUID, list in next, tbl do
 						local npcId = strsplit("-", npcPartialGUID)
-						if not TIMERS_BLOCKLIST[spellId] or not TIMERS_BLOCKLIST[spellId][tonumber(npcId)] then
+						if not TIMERS_BLOCKLIST[spellId] or (#TIMERS_BLOCKLIST[spellId] > 0 and not TIMERS_BLOCKLIST[spellId][tonumber(npcId)]) then -- Block either by spellId if no npcId is defined, or by spellId + npcId
 							local n = format("%s-%d-npc:%s", GetSpellInfo(spellId), spellId, npcPartialGUID)
 							local str
 							for i = 2, #list do
@@ -2045,7 +2045,7 @@ function Transcriptor:StopLog(silent)
 				for spellId,tbl in next, compareStart do
 					for npcPartialGUID, list in next, tbl do
 						local npcId = strsplit("-", npcPartialGUID)
-						if not TIMERS_BLOCKLIST[spellId] or not TIMERS_BLOCKLIST[spellId][tonumber(npcId)] then
+						if not TIMERS_BLOCKLIST[spellId] or (#TIMERS_BLOCKLIST[spellId] > 0 and not TIMERS_BLOCKLIST[spellId][tonumber(npcId)]) then -- Block either by spellId if no npcId is defined, or by spellId + npcId
 							local n = format("%s-%d-npc:%s", GetSpellInfo(spellId), spellId, npcPartialGUID)
 							local str
 							for i = 2, #list do
@@ -2118,7 +2118,7 @@ function Transcriptor:StopLog(silent)
 				for spellId,tbl in next, compareSummon do
 					for npcPartialGUID, list in next, tbl do
 						local npcId = strsplit("-", npcPartialGUID)
-						if not TIMERS_BLOCKLIST[spellId] or not TIMERS_BLOCKLIST[spellId][tonumber(npcId)] then
+						if not TIMERS_BLOCKLIST[spellId] or (#TIMERS_BLOCKLIST[spellId] > 0 and not TIMERS_BLOCKLIST[spellId][tonumber(npcId)]) then -- Block either by spellId if no npcId is defined, or by spellId + npcId
 							local n = format("%s-%d-npc:%s", GetSpellInfo(spellId), spellId, npcPartialGUID)
 							local str
 							for i = 2, #list do
@@ -2191,7 +2191,7 @@ function Transcriptor:StopLog(silent)
 				for spellId,tbl in next, compareAuraApplied do
 					for npcPartialGUID, list in next, tbl do
 						local npcId = strsplit("-", npcPartialGUID)
-						if not TIMERS_BLOCKLIST[spellId] or not TIMERS_BLOCKLIST[spellId][tonumber(npcId)] then
+						if not TIMERS_BLOCKLIST[spellId] or (#TIMERS_BLOCKLIST[spellId] > 0 and not TIMERS_BLOCKLIST[spellId][tonumber(npcId)]) then -- Block either by spellId if no npcId is defined, or by spellId + npcId
 							local n = format("%s-%d-npc:%s", GetSpellInfo(spellId), spellId, npcPartialGUID)
 							local str
 							local zeroCounter = 1

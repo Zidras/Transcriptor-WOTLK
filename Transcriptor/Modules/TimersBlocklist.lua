@@ -6,7 +6,7 @@ end
 
 --[[ Block certain spells from appearing in the TIMERS list
 	[spellId] = { -- Spell name
-		[npcId] = true, -- NPC name (reason)
+		[npcId] = true, --  <optional> NPC name (reason)
 	}
 ]]
 addonTbl.TIMERS_BLOCKLIST = {
