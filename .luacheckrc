@@ -80,7 +80,7 @@ globals = {
 	"TexturePoolMixin",
 	"TexturePool_Hide",
 	"TexturePool_HideAndClearAnchors",
-	
+
 	"_G",
 	"bit",
 	"Recount",
@@ -140,6 +140,9 @@ globals = {
 	"C_Talent",
 	"TimerFrame",
 	"WorldStateTopCenterFrame",
+
+	-- Awesome WotLK
+	"C_NamePlate",
 
 	-- frames created via CreateFrame
 	"AlwaysUpFrame1",

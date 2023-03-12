@@ -28,7 +28,7 @@ local compareUnitStart = nil
 local compareSummon = nil
 local compareAuraApplied = nil
 local compareStartTime = nil
---local collectNameplates = nil
+local collectNameplates = nil
 local collectPlayerAuras = nil
 local hiddenUnitAuraCollector = nil
 local playerSpellCollector = nil
@@ -61,6 +61,8 @@ local UnitLevel, UnitCreatureType = UnitLevel, UnitCreatureType
 local GetInstanceInfo, GetCurrentMapAreaID = GetInstanceInfo, GetCurrentMapAreaID
 local GetZoneText, GetRealZoneText, GetSubZoneText, GetSpellInfo = GetZoneText, GetRealZoneText, GetSubZoneText, GetSpellInfo
 --local GetBestMapForUnit = C_Map.GetBestMapForUnit
+
+local C_NamePlate = C_NamePlate -- https://github.com/FrostAtom/awesome_wotlk
 
 -- GLOBALS: TranscriptDB BigWigsLoader DBM CLOSE SlashCmdList SLASH_TRANSCRIPTOR1 SLASH_TRANSCRIPTOR2 SLASH_TRANSCRIPTOR3 EasyMenu CloseDropDownMenus
 -- GLOBALS: GetMapID GetBossID GetSectionID
@@ -964,13 +966,24 @@ end
 
 do
 	local UnitIsUnit = UnitIsUnit
-	local wantedUnits = {
+	local wantedUnits
+	if C_NamePlate then
+		wantedUnits = {
+			target = true, focus = true,
+			nameplate1 = true, nameplate2 = true, nameplate3 = true, nameplate4 = true, nameplate5 = true, nameplate6 = true, nameplate7 = true, nameplate8 = true, nameplate9 = true, nameplate10 = true,
+			nameplate11 = true, nameplate12 = true, nameplate13 = true, nameplate14 = true, nameplate15 = true, nameplate16 = true, nameplate17 = true, nameplate18 = true, nameplate19 = true, nameplate20 = true,
+			nameplate21 = true, nameplate22 = true, nameplate23 = true, nameplate24 = true, nameplate25 = true, nameplate26 = true, nameplate27 = true, nameplate28 = true, nameplate29 = true, nameplate30 = true,
+			nameplate31 = true, nameplate32 = true, nameplate33 = true, nameplate34 = true, nameplate35 = true, nameplate36 = true, nameplate37 = true, nameplate38 = true, nameplate39 = true, nameplate40 = true,
+		}
+	else
+		wantedUnits = {
 		target = true, focus = true,
 		-- nameplate1 = true, nameplate2 = true, nameplate3 = true, nameplate4 = true, nameplate5 = true, nameplate6 = true, nameplate7 = true, nameplate8 = true, nameplate9 = true, nameplate10 = true,
 		-- nameplate11 = true, nameplate12 = true, nameplate13 = true, nameplate14 = true, nameplate15 = true, nameplate16 = true, nameplate17 = true, nameplate18 = true, nameplate19 = true, nameplate20 = true,
 		-- nameplate21 = true, nameplate22 = true, nameplate23 = true, nameplate24 = true, nameplate25 = true, nameplate26 = true, nameplate27 = true, nameplate28 = true, nameplate29 = true, nameplate30 = true,
 		-- nameplate31 = true, nameplate32 = true, nameplate33 = true, nameplate34 = true, nameplate35 = true, nameplate36 = true, nameplate37 = true, nameplate38 = true, nameplate39 = true, nameplate40 = true,
-	}
+		}
+	end
 	local bossUnits = {
 		boss1 = true, boss2 = true, boss3 = true, boss4 = true, boss5 = true,
 		arena1 = true, arena2 = true, arena3 = true, arena4 = true, arena5 = true,
@@ -1333,14 +1346,16 @@ do
 	end
 end
 
---[[function sh.NAME_PLATE_UNIT_ADDED(unit)
-	local guid = UnitGUID(unit)
-	if not collectNameplates[guid] then
-		collectNameplates[guid] = true
-		local name = UnitName(unit)
-		return strjoin("#", name, guid)
+if C_NamePlate then
+	function sh.NAME_PLATE_UNIT_ADDED(unit)
+		local guid = UnitGUID(unit)
+		if not collectNameplates[guid] then
+			collectNameplates[guid] = true
+			local name = UnitName(unit)
+			return strjoin("#", name, guid)
+		end
 	end
-end]]
+end
 
 local wowEvents = {
 	-- Raids
@@ -1470,6 +1485,10 @@ local eventCategories = {
 	UPDATE_WORLD_STATES = "WORLD_STATE",
 	WORLD_STATE_UI_TIMER_UPDATE = "WORLD_STATE",
 }
+if C_NamePlate then
+	tinsert(wowEvents, "NAME_PLATE_UNIT_ADDED")
+	eventCategories.NAME_PLATE_UNIT_ADDED = "NONE"
+end
 local bwEvents = {
 	"BigWigs_Message",
 	"BigWigs_StartBar",
@@ -1857,7 +1876,7 @@ do
 				end
 			end]]
 
-			--collectNameplates = {}
+			collectNameplates = {}
 			hiddenUnitAuraCollector = {}
 			playerSpellCollector = {}
 			previousSpecialEvent = nil
@@ -2603,7 +2622,7 @@ function Transcriptor:StopLog(silent)
 		compareStartTime = nil
 		collectPlayerAuras = nil
 		logStartTime = nil
-		--collectNameplates = nil
+		collectNameplates = nil
 		hiddenUnitAuraCollector = nil
 		playerSpellCollector = nil
 
