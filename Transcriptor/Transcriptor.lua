@@ -1847,7 +1847,9 @@ do
 	local wowVersion, buildRevision = GetBuildInfo() -- Note that both returns here are strings, not numbers.
 	local realmName = GetRealmName()
 	local playerName = UnitName("player")
-	local logNameFormat = "[%s]@[%s] - Zone:%d = %s/%s, Difficulty:%d (%s), Type:%s, " .. format("Transcriptor: %s, DBM: %s, Version: %s.%s - Player: %s | Server: %s", transcriptorVersion, dbmRevision, wowVersion, buildRevision, playerName, realmName)
+	local playerClass = select(2, UnitClass("player"))
+	local playerRace = select(2, UnitRace("player"))
+	local logNameFormat = "[%s]@[%s] - Zone:%d = %s/%s, Difficulty:%d (%s), Type:%s, " .. format("Transcriptor: %s, DBM: %s, Version: %s.%s - Player: %s (%s, %s) | Server: %s", transcriptorVersion, dbmRevision, wowVersion, buildRevision, playerName, playerClass, playerRace, realmName)
 	function Transcriptor:StartLog(silent)
 		if logging then
 			print(L["You are already logging an encounter."])
