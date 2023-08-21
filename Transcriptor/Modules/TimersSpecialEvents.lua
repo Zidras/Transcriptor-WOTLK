@@ -42,7 +42,6 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 	},
 	["SPELL_CAST_START"] = {
 		-- [[ Icecrown Citadel ]] --
---[[
 		[72852] = { -- Create Concoction (25H)
 			[36678] = "Intermission 1", -- Professor Putricide
 		},
@@ -67,7 +66,6 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 		[71893] = { -- Guzzle Potions (10N)
 			[36678] = "Intermission 2", -- Professor Putricide
 		},
---]]
 	},
 	["SPELL_CAST_SUCCESS"] = {
 	},
