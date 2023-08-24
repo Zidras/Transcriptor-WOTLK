@@ -2008,19 +2008,19 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 									else
 										local sincePull = list[i] - list[1]
-										str = format("%s = pull:%.1f", n, sincePull/1000)
+										str = format("%s = pull:%.2f", n, sincePull/1000)
 									end
 								else
 									if type(list[i]) == "table" then
 										if type(list[i-1]) == "number" then
 											local t = list[i][1]-list[i-1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										elseif type(list[i-1]) == "table" then
 											local t = list[i][1]-list[i-1][1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										else
 											str = format("%s, %s", str, list[i][2])
 										end
@@ -2035,28 +2035,28 @@ function Transcriptor:StopLog(silent)
 														end
 														local tStage = list[i] - list[i-1][1]
 														local t = list[i] - list[i-counter]
-														str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+														str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 													else
 														local tStage = list[i] - list[i-1][1]
 														local tStagePrevious = list[i] - list[i-2][1]
 														local tStagePreviousMore = list[i] - list[i-3][1]
 														local t = list[i] - list[i-4]
-														str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+														str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 													end
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local t = list[i] - list[i-3]
-													str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local t = list[i] - list[i-2]
-												str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+												str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 											end
 										else
 											local t = list[i] - list[i-1]
-											str = format("%s, %.1f", str, t/1000)
+											str = format("%s, %.2f", str, t/1000)
 										end
 									end
 								end
@@ -2081,19 +2081,19 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 									else
 										local sincePull = list[i] - list[1]
-										str = format("%s = pull:%.1f", n, sincePull/1000)
+										str = format("%s = pull:%.2f", n, sincePull/1000)
 									end
 								else
 									if type(list[i]) == "table" then
 										if type(list[i-1]) == "number" then
 											local t = list[i][1]-list[i-1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										elseif type(list[i-1]) == "table" then
 											local t = list[i][1]-list[i-1][1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										else
 											str = format("%s, %s", str, list[i][2])
 										end
@@ -2108,28 +2108,28 @@ function Transcriptor:StopLog(silent)
 														end
 														local tStage = list[i] - list[i-1][1]
 														local t = list[i] - list[i-counter]
-														str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+														str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 													else
 														local tStage = list[i] - list[i-1][1]
 														local tStagePrevious = list[i] - list[i-2][1]
 														local tStagePreviousMore = list[i] - list[i-3][1]
 														local t = list[i] - list[i-4]
-														str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+														str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 													end
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local t = list[i] - list[i-3]
-													str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local t = list[i] - list[i-2]
-												str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+												str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 											end
 										else
 											local t = list[i] - list[i-1]
-											str = format("%s, %.1f", str, t/1000)
+											str = format("%s, %.2f", str, t/1000)
 										end
 									end
 								end
@@ -2154,19 +2154,19 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 									else
 										local sincePull = list[i] - list[1]
-										str = format("%s = pull:%.1f", n, sincePull/1000)
+										str = format("%s = pull:%.2f", n, sincePull/1000)
 									end
 								else
 									if type(list[i]) == "table" then
 										if type(list[i-1]) == "number" then
 											local t = list[i][1]-list[i-1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										elseif type(list[i-1]) == "table" then
 											local t = list[i][1]-list[i-1][1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										else
 											str = format("%s, %s", str, list[i][2])
 										end
@@ -2181,28 +2181,28 @@ function Transcriptor:StopLog(silent)
 														end
 														local tStage = list[i] - list[i-1][1]
 														local t = list[i] - list[i-counter]
-														str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+														str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 													else
 														local tStage = list[i] - list[i-1][1]
 														local tStagePrevious = list[i] - list[i-2][1]
 														local tStagePreviousMore = list[i] - list[i-3][1]
 														local t = list[i] - list[i-4]
-														str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+														str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 													end
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local t = list[i] - list[i-3]
-													str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local t = list[i] - list[i-2]
-												str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+												str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 											end
 										else
 											local t = list[i] - list[i-1]
-											str = format("%s, %.1f", str, t/1000)
+											str = format("%s, %.2f", str, t/1000)
 										end
 									end
 								end
@@ -2228,19 +2228,19 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 									else
 										local sincePull = list[i] - list[1]
-										str = format("%s = pull:%.1f", n, sincePull/1000)
+										str = format("%s = pull:%.2f", n, sincePull/1000)
 									end
 								else
 									if type(list[i]) == "table" then
 										if type(list[i-1]) == "number" then
 											local t = list[i][1]-list[i-1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										elseif type(list[i-1]) == "table" then
 											local t = list[i][1]-list[i-1][1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										else
 											str = format("%s, %s", str, list[i][2])
 										end
@@ -2255,33 +2255,33 @@ function Transcriptor:StopLog(silent)
 														end
 														local tStage = list[i] - list[i-1][1]
 														local t = list[i] - list[i-counter]
-														str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+														str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 													else
 														local tStage = list[i] - list[i-1][1]
 														local tStagePrevious = list[i] - list[i-2][1]
 														local tStagePreviousMore = list[i] - list[i-3][1]
 														local t = list[i] - list[i-4]
-														str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+														str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 													end
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local t = list[i] - list[i-3]
-													str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local t = list[i] - list[i-2]
-												str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+												str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 											end
 										else
 											local t = list[i] - list[i-1]
-											local shorten = format("%.1f", t/1000)
+											local shorten = format("%.2f", t/1000)
 											if shorten == "0.0" then
 												local typeNext = type(list[i+1])
 												if typeNext == "number" then
 													local nextT = list[i+1] - list[i]
-													local nextShorten = format("%.1f", nextT/1000)
+													local nextShorten = format("%.2f", nextT/1000)
 													if nextShorten == "0.0" then
 														zeroCounter = zeroCounter + 1
 													else
@@ -2293,7 +2293,7 @@ function Transcriptor:StopLog(silent)
 													zeroCounter = 1
 												end
 											else
-												str = format("%s, %.1f", str, t/1000)
+												str = format("%s, %.2f", str, t/1000)
 											end
 										end
 									end
@@ -2318,19 +2318,19 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 									else
 										local sincePull = list[i] - list[1]
-										str = format("%s = pull:%.1f", n, sincePull/1000)
+										str = format("%s = pull:%.2f", n, sincePull/1000)
 									end
 								else
 									if type(list[i]) == "table" then
 										if type(list[i-1]) == "number" then
 											local t = list[i][1]-list[i-1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										elseif type(list[i-1]) == "table" then
 											local t = list[i][1]-list[i-1][1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										else
 											str = format("%s, %s", str, list[i][2])
 										end
@@ -2345,28 +2345,28 @@ function Transcriptor:StopLog(silent)
 														end
 														local tStage = list[i] - list[i-1][1]
 														local t = list[i] - list[i-counter]
-														str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+														str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 													else
 														local tStage = list[i] - list[i-1][1]
 														local tStagePrevious = list[i] - list[i-2][1]
 														local tStagePreviousMore = list[i] - list[i-3][1]
 														local t = list[i] - list[i-4]
-														str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+														str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 													end
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local t = list[i] - list[i-3]
-													str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local t = list[i] - list[i-2]
-												str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+												str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 											end
 										else
 											local t = list[i] - list[i-1]
-											str = format("%s, %.1f", str, t/1000)
+											str = format("%s, %.2f", str, t/1000)
 										end
 									end
 								end
@@ -2390,19 +2390,19 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 									else
 										local sincePull = list[i] - list[1]
-										str = format("%s = pull:%.1f", n, sincePull/1000)
+										str = format("%s = pull:%.2f", n, sincePull/1000)
 									end
 								else
 									if type(list[i]) == "table" then
 										if type(list[i-1]) == "number" then
 											local t = list[i][1]-list[i-1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										elseif type(list[i-1]) == "table" then
 											local t = list[i][1]-list[i-1][1]
-											str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+											str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 										else
 											str = format("%s, %s", str, list[i][2])
 										end
@@ -2417,28 +2417,28 @@ function Transcriptor:StopLog(silent)
 														end
 														local tStage = list[i] - list[i-1][1]
 														local t = list[i] - list[i-counter]
-														str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+														str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 													else
 														local tStage = list[i] - list[i-1][1]
 														local tStagePrevious = list[i] - list[i-2][1]
 														local tStagePreviousMore = list[i] - list[i-3][1]
 														local t = list[i] - list[i-4]
-														str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+														str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 													end
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local t = list[i] - list[i-3]
-													str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local t = list[i] - list[i-2]
-												str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+												str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 											end
 										else
 											local t = list[i] - list[i-1]
-											str = format("%s, %.1f", str, t/1000)
+											str = format("%s, %.2f", str, t/1000)
 										end
 									end
 								end
@@ -2462,19 +2462,19 @@ function Transcriptor:StopLog(silent)
 									local sincePull = list[i] - list[1][1]
 									local sincePreviousEvent = list[i] - list[1][2]
 									local previousEventName = list[1][3]
-									str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+									str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 								else
 									local sincePull = list[i] - list[1]
-									str = format("%s = pull:%.1f", n, sincePull/1000)
+									str = format("%s = pull:%.2f", n, sincePull/1000)
 								end
 							else
 								if type(list[i]) == "table" then
 									if type(list[i-1]) == "number" then
 										local t = list[i][1]-list[i-1]
-										str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+										str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 									elseif type(list[i-1]) == "table" then
 										local t = list[i][1]-list[i-1][1]
-										str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+										str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 									else
 										str = format("%s, %s", str, list[i][2])
 									end
@@ -2489,28 +2489,28 @@ function Transcriptor:StopLog(silent)
 													end
 													local tStage = list[i] - list[i-1][1]
 													local t = list[i] - list[i-counter]
-													str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+													str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local tStagePreviousMore = list[i] - list[i-3][1]
 													local t = list[i] - list[i-4]
-													str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local tStagePrevious = list[i] - list[i-2][1]
 												local t = list[i] - list[i-3]
-												str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+												str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 											end
 										else
 											local tStage = list[i] - list[i-1][1]
 											local t = list[i] - list[i-2]
-											str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+											str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 										end
 									else
 										local t = list[i] - list[i-1]
-										str = format("%s, %.1f", str, t/1000)
+										str = format("%s, %.2f", str, t/1000)
 									end
 								end
 							end
@@ -2533,19 +2533,19 @@ function Transcriptor:StopLog(silent)
 									local sincePull = list[i] - list[1][1]
 									local sincePreviousEvent = list[i] - list[1][2]
 									local previousEventName = list[1][3]
-									str = format("%s = pull:%.1f/%s/%.1f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+									str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
 								else
 									local sincePull = list[i] - list[1]
-									str = format("%s = pull:%.1f", n, sincePull/1000)
+									str = format("%s = pull:%.2f", n, sincePull/1000)
 								end
 							else
 								if type(list[i]) == "table" then
 									if type(list[i-1]) == "number" then
 										local t = list[i][1]-list[i-1]
-										str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+										str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 									elseif type(list[i-1]) == "table" then
 										local t = list[i][1]-list[i-1][1]
-										str = format("%s, %s/%.1f", str, list[i][2], t/1000)
+										str = format("%s, %s/%.2f", str, list[i][2], t/1000)
 									else
 										str = format("%s, %s", str, list[i][2])
 									end
@@ -2560,28 +2560,28 @@ function Transcriptor:StopLog(silent)
 													end
 													local tStage = list[i] - list[i-1][1]
 													local t = list[i] - list[i-counter]
-													str = format("%s, TooManyStages/%.1f/%.1f", str, tStage/1000, t/1000)
+													str = format("%s, TooManyStages/%.2f/%.2f", str, tStage/1000, t/1000)
 												else
 													local tStage = list[i] - list[i-1][1]
 													local tStagePrevious = list[i] - list[i-2][1]
 													local tStagePreviousMore = list[i] - list[i-3][1]
 													local t = list[i] - list[i-4]
-													str = format("%s, %.1f/%.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
+													str = format("%s, %.2f/%.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, tStagePreviousMore/1000, t/1000)
 												end
 											else
 												local tStage = list[i] - list[i-1][1]
 												local tStagePrevious = list[i] - list[i-2][1]
 												local t = list[i] - list[i-3]
-												str = format("%s, %.1f/%.1f/%.1f", str, tStage/1000, tStagePrevious/1000, t/1000)
+												str = format("%s, %.2f/%.2f/%.2f", str, tStage/1000, tStagePrevious/1000, t/1000)
 											end
 										else
 											local tStage = list[i] - list[i-1][1]
 											local t = list[i] - list[i-2]
-											str = format("%s, %.1f/%.1f", str, tStage/1000, t/1000)
+											str = format("%s, %.2f/%.2f", str, tStage/1000, t/1000)
 										end
 									else
 										local t = list[i] - list[i-1]
-										str = format("%s, %.1f", str, t/1000)
+										str = format("%s, %.2f", str, t/1000)
 									end
 								end
 							end
