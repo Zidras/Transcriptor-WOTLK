@@ -19,6 +19,16 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 	["UNIT_SPELLCAST_INTERRUPTED"] = {
 	},
 	["SPELL_AURA_APPLIED"] = {
+		-- [[ Icecrown Citadel ]] --
+		[70952] = { -- Invocation of Blood (Prince Valanar)
+			[38008] = "Valanar Empowered" -- Blood Orb Controller
+		},
+		[70981] = { -- Invocation of Blood (Prince Keleseth)
+			[38008] = "Keleseth Empowered" -- Blood Orb Controller
+		},
+		[70982] = { -- Invocation of Blood (Prince Taldaram)
+			[38008] = "Taldaram Empowered" -- Blood Orb Controller
+		},
 	},
 	["SPELL_AURA_APPLIED_DOSE"] = {
 	},
