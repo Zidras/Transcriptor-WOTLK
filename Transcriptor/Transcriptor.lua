@@ -154,6 +154,8 @@ local function InsertSpecialEvent(name)
 		end
 	end
 end
+Transcriptor.InsertSpecialEvent = InsertSpecialEvent -- Adding to the addon API, to enable access from 3rd party addons (like DBM) that already handle scheduling functions*
+-- *AceTimer was not yielding the desired results with scheduling function inside TimersSpecialEvents.lua, without rewriting the existing implementation
 
 --------------------------------------------------------------------------------
 -- Utility
