@@ -1542,9 +1542,11 @@ local function eventHandler(_, event, ...)
 		-- Use DBM EndCombat callbacks to emulate BOSS_KILL & ENCOUNTER_END
 		elseif event == "DBM_Kill" then
 			local mod = ...
+			previousSpecialEvent = nil -- prevent Stage from spreading if log was not stopped between pulls
 			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN))
 		elseif event == "DBM_Wipe" then
 			local mod = ...
+			previousSpecialEvent = nil -- prevent Stage from spreading if log was not stopped between pulls
 			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN))
 		end
 
