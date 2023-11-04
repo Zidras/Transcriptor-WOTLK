@@ -83,10 +83,26 @@ local function MobId(guid, extra)
 	if not guid then return 1 end
 	local strId = tonumber(guid:sub(9, 12), 16) or 1
 	if extra then
-		local uniq = tonumber(guid:sub(13), 16) or 1
+		local uniq = tonumber(guid:sub(13), 16) or 1 -- spawnCounter
 		return strId.."-"..uniq
 	else
 		return strId
+	end
+end
+
+local function MobType(guid)
+	if not guid then return "guid nil" end
+	local unitType = band(guid:sub(1, 5), 0x00F)
+	if unitType == 0 then -- or 0x000
+		return "Player"
+	elseif unitType == 3 then -- or 0x003
+		return "NPC"
+	elseif unitType == 4 then -- or 0x004
+		return "Pet"
+	elseif unitType == 5 then -- or 0x005
+		return "Vehicle"
+	else
+		return "Unknown"
 	end
 end
 
@@ -209,8 +225,11 @@ function GetSectionID(name)
 	end
 end]]
 
-do
+--------------------------------------------------------------------------------
+-- Spell blocklist parser: /getspells
+--
 
+do
 	--[[local function onHyperlinkLeave()
 		GameTooltip:Hide()
 	end]]
@@ -261,8 +280,9 @@ do
 		close:SetPoint("TOPRIGHT", frame[i], "TOPRIGHT", 0, 25)
 	end
 
-	local function GetLogSpells()
+	local function GetLogSpells(slashCommandText)
 		if InCombatLockdown() or UnitAffectingCombat("player") or IsFalling() then return end
+		if slashCommandText == "logflags" then TranscriptIgnore.logFlags = true print("Player flags will be added to all future logs.") return end
 
 		local total, totalSorted = {}, {}
 		local auraTbl, castTbl, summonTbl = {}, {}, {}
@@ -305,10 +325,17 @@ do
 			[154304] = true, -- Waveblade Shaman
 			[150202] = true, -- Waveblade Hunter]]
 		}
-		local events = {
-			"SPELL_AURA_[AR][^#]+#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#", -- SPELL_AURA_[AR] to filter _BROKEN
-			"SPELL_CAST_[^#]+#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#",
-			"SPELL_SUMMON#(%d+)#([^#]+%-[^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#"
+--[[	Retail (names replaces with Playername):
+			"<73.02 01:22:55> [CLEU] SPELL_AURA_APPLIED#Creature-0-4251-1007-22315-58757-0003304C10#Scholomance Acolyte#Player-1402-0A88D169#Playername-Turalyon#111594#Shatter Soul#DEBUFF#nil"
+		WotLK (names replaces with Playername):
+			"<336.50 20:27:21> [CLEU] SPELL_AURA_APPLIED#0xF150008F4600050E#Professor Putricide#0x06000000004551AF#Playername#72672#Mutated Plague#DEBUFF#nil#"
+			"<335.85 20:27:21> [CLEU] SPELL_CAST_SUCCESS#0xF150008F4600050E#Professor Putricide#0x0000000000000000#nil#70341#Slime Puddle#nil#nil#"
+			"<338.76 20:27:24> [CLEU] SPELL_SUMMON#0xF150008F4600050E#Professor Putricide#0xF13000933A000897#Growing Ooze Puddle#70342#Slime Puddle#nil#nil#"
+		GUID structure is different in 3.3.5a, so the pattern was changed slightly from retail, but the functionality remains the same]]
+		local events = { -- requires shouldLogFlags enabled for the pattern to work!
+			"SPELL_AURA_[AR][^#]+#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#", -- SPELL_AURA_[AR] to filter _BROKEN
+			"SPELL_CAST_[^#]+#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#",
+			"SPELL_SUMMON#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#"
 		}
 		local tables = {
 			auraTbl,
@@ -332,16 +359,16 @@ do
 							local flags = tonumber(flagsText)
 							local tbl = tables[j]
 							local sortedTbl = sortedTables[j]
-							if spellId and flags and band(flags, mineOrPartyOrRaid) ~= 0 and not ignoreList[spellId] and not PLAYER_SPELL_BLOCKLIST[spellId] and #sortedTbl < 15 then -- Check total to avoid duplicates and lock to a max of 15 for sanity
+							if spellId and flags and band(flags, mineOrPartyOrRaid) ~= 0 and not ignoreList[spellId] and not PLAYER_SPELL_BLOCKLIST[spellId] then -- Check total to avoid duplicates
 								if not total[spellId] or destGUID ~= "" then
-									local srcGUIDType, _, _, _, _, npcIdStr = strsplit("-", srcGUID)
-									local npcId = tonumber(npcIdStr)
+									local srcGUIDType = MobType(srcGUID)
+									local npcId = MobId(srcGUID)
 									if not npcIgnoreList[npcId] then
-										local destGUIDType = strsplit("-", destGUID)
-										if find(destGUID, "^P[le][at]") then -- Only players/pets, don't remove "-" from NPC names
+										local destGUIDType = MobType(destGUID)
+										if destGUIDType == "Player" or destGUIDType == "Pet" then -- Only players/pets, don't remove "-" from NPC names
 											destName = gsub(destName, "%-.+", "*") -- Replace server name with *
 										end
-										if find(srcGUID, "^P[le][at]") then-- Only players/pets, don't remove "-" from NPCs names
+										if srcGUIDType == "Player" or srcGUIDType == "Pet" then-- Only players/pets, don't remove "-" from NPCs names
 											srcName = gsub(srcName, "%-.+", "*") -- Replace server name with *
 										end
 										srcName = gsub(srcName, "%(.+", "") -- Remove health/mana
@@ -405,7 +432,15 @@ do
 		end
 
 		-- Display newly found spells for analysis
-		editBox[1]:SetText(text)
+		if not TranscriptIgnore.logFlags then
+			editBox[1]:SetText("For this feature to work, player flags must be added to the logs.\nYou can enable additional logging by typing:\n/getspells logflags")
+		else
+			if not text:find("%d%d%d") then
+				editBox[1]:SetText("Nothing was found.\nYou might be looking at logs that didn't have player flags recorded.")
+			else
+				editBox[1]:SetText(text)
+			end
+		end
 		frame[1]:ClearAllPoints()
 		frame[1]:SetPoint("BOTTOMRIGHT", UIParent, "CENTER")
 		frame[1]:Show()
@@ -673,7 +708,7 @@ local sh = {}
 function strjoin(delimiter, ...)
 	local ret = nil
 	for i = 1, select("#", ...) do
-		ret = (ret or "") .. tostring((select(i, ...))) .. ":" -- ignoring delimiter arg, but ":" gives better legibility anyway, so keep it
+		ret = (ret or "") .. tostring((select(i, ...))) .. (delimiter or "#") -- # is necessary for the CLEU pattern matching, and only a handful of spells in the database with this character, so risk of matching is negligible. Using semicolon : by contrast is more common in the spell names
 	end
 	return ret
 end
@@ -692,7 +727,7 @@ sh.WORLD_STATE_UI_TIMER_UPDATE = sh.UPDATE_WORLD_STATES
 
 do
 	badSourcelessPlayerSpellList = {
-		[81782] = true, -- Power Word: Barrier
+--		[81782] = true, -- Power Word: Barrier
 	}
 	local badPlayerFilteredEvents = {
 		["SPELL_CAST_SUCCESS"] = true,
