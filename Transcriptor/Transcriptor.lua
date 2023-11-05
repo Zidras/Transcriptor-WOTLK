@@ -285,8 +285,8 @@ do
 		if slashCommandText == "logflags" then TranscriptIgnore.logFlags = true print("Player flags will be added to all future logs.") return end
 
 		local total, totalSorted = {}, {}
-		local auraTbl, castTbl, summonTbl = {}, {}, {}
-		local aurasSorted, castsSorted, summonSorted = {}, {}, {}
+		local auraTbl, castTbl, summonTbl, extraAttacksTbl = {}, {}, {}, {}
+		local aurasSorted, castsSorted, summonSorted, extraAttacksSorted = {}, {}, {}, {}
 		local playerCastList = {}
 		local ignoreList = {
 			[43681] = true, -- Inactive (PvP)
@@ -331,21 +331,25 @@ do
 			"<336.50 20:27:21> [CLEU] SPELL_AURA_APPLIED#0xF150008F4600050E#Professor Putricide#0x06000000004551AF#Playername#72672#Mutated Plague#DEBUFF#nil#"
 			"<335.85 20:27:21> [CLEU] SPELL_CAST_SUCCESS#0xF150008F4600050E#Professor Putricide#0x0000000000000000#nil#70341#Slime Puddle#nil#nil#"
 			"<338.76 20:27:24> [CLEU] SPELL_SUMMON#0xF150008F4600050E#Professor Putricide#0xF13000933A000897#Growing Ooze Puddle#70342#Slime Puddle#nil#nil#"
-		GUID structure is different in 3.3.5a, so the pattern was changed slightly from retail, but the functionality remains the same]]
-		local events = { -- requires shouldLogFlags enabled for the pattern to work!
+		GUID structure is different in 3.3.5a, so the pattern was changed slightly from retail, but the functionality remains the same
+		Requires shouldLogFlags enabled for the pattern to work!]]
+		local events = { --event#sourceOrDestFlags#sourceGUID#sourceName#destGUID or empty#destName or 'nil'#spellId#spellName
 			"SPELL_AURA_[AR][^#]+#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#", -- SPELL_AURA_[AR] to filter _BROKEN
 			"SPELL_CAST_[^#]+#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#",
-			"SPELL_SUMMON#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#"
+			"SPELL_SUMMON#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#",
+			"SPELL_EXTRA_ATTACKS#(%d+)#([^#]+)#([^#]+)#([^#]*)#([^#]+)#(%d+)#[^#]+#"
 		}
 		local tables = {
 			auraTbl,
 			castTbl,
 			summonTbl,
+			extraAttacksTbl,
 		}
 		local sortedTables = {
 			aurasSorted,
 			castsSorted,
 			summonSorted,
+			extraAttacksSorted,
 		}
 		for _, logTbl in next, TranscriptDB do
 			if type(logTbl) == "table" then
@@ -353,7 +357,7 @@ do
 					for i=1, #logTbl.total do
 						local text = logTbl.total[i]
 
-						for j = 1, 3 do
+						for j = 1, #events do
 							local flagsText, srcGUID, srcName, destGUID, destName, idText = strmatch(text, events[j])
 							local spellId = tonumber(idText)
 							local flags = tonumber(flagsText)
@@ -402,7 +406,7 @@ do
 		end
 
 		tsort(aurasSorted)
-		local text = "-- AURAS\n"
+		local text = "-- SPELL_AURA_[APPLIED/REMOVED/REFRESH]\n"
 		for i = 1, #aurasSorted do
 			local id = aurasSorted[i]
 			local name = GetSpellInfo(id)
@@ -410,7 +414,7 @@ do
 		end
 
 		tsort(castsSorted)
-		text = text.. "\n-- CASTS\n"
+		text = text.. "\n-- SPELL_CAST_[START/SUCCESS]\n"
 		for i = 1, #castsSorted do
 			local id = castsSorted[i]
 			local name = GetSpellInfo(id)
@@ -418,11 +422,19 @@ do
 		end
 
 		tsort(summonSorted)
-		text = text.. "\n-- SUMMONS\n"
+		text = text.. "\n-- SPELL_SUMMON\n"
 		for i = 1, #summonSorted do
 			local id = summonSorted[i]
 			local name = GetSpellInfo(id)
 			text = format("%s%d || |cFFFFFF00|Hspell:%d|h%s|h|r || %s\n", text, id, id, name, summonTbl[id])
+		end
+
+		tsort(extraAttacksSorted)
+		text = text.. "\n-- SPELL_EXTRA_ATTACKS\n"
+		for i = 1, #extraAttacksSorted do
+			local id = extraAttacksSorted[i]
+			local name = GetSpellInfo(id)
+			text = format("%s%d || |cFFFFFF00|Hspell:%d|h%s|h|r || %s\n", text, id, id, name, extraAttacksTbl[id])
 		end
 
 		text = text.. "\n-- PLAYER_CASTS\n"
@@ -605,6 +617,7 @@ do
 		["SPELL_AURA_REMOVED_DOSE"] = true,
 		["SPELL_CAST_START"] = true,
 		["SPELL_SUMMON"] = true,
+		["SPELL_EXTRA_ATTACKS"] = true,
 		--"<87.10 17:55:03> [CLEU] SPELL_AURA_BROKEN_SPELL#Creature-0-3771-1676-28425-118022-000004A6B5#Infernal Chaosbringer#Player-XYZ#XYZ#115191#Stealth#242906#Immolation Aura", -- [148]
 		--"<498.56 22:02:38> [CLEU] SPELL_AURA_BROKEN_SPELL#Creature-0-3895-1676-10786-106551-00008631CC-TSGuardian#Hati#Creature-0-3895-1676-10786-120697-000086306F#Worshiper of Elune#206961#Tremble Before Me#118459#Beast Cleave", -- [8039]
 		--["SPELL_AURA_BROKEN_SPELL"] = true,
