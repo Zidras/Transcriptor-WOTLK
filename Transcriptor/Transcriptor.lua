@@ -1424,6 +1424,7 @@ local wowEvents = {
 	"UPDATE_WORLD_STATES",
 	"WORLD_STATE_UI_TIMER_UPDATE",
 }
+
 local eventCategories = {
 	PLAYER_REGEN_DISABLED = "COMBAT",
 	PLAYER_REGEN_ENABLED = "COMBAT",
@@ -1518,6 +1519,8 @@ if C_NamePlate then
 	tinsert(wowEvents, "NAME_PLATE_UNIT_ADDED")
 	eventCategories.NAME_PLATE_UNIT_ADDED = "NONE"
 end
+Transcriptor.EventCategories = eventCategories
+
 local bwEvents = {
 	"BigWigs_Message",
 	"BigWigs_StartBar",
