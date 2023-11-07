@@ -10,7 +10,7 @@
 ## Notes-esES: Logging utility for boss encounters.
 ## Notes-esMX: Logging utility for boss encounters.
 ## Author: Funkydude
-## Version: 10.1.9
+## Version: 10.1.15
 ## X-Credits: Kyahx, Rabbit, MysticalOS, nebula169, Zidras
 ## X-Category: Development Tools
 ## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
