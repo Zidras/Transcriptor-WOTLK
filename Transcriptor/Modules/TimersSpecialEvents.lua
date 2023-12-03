@@ -21,13 +21,16 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 	["SPELL_AURA_APPLIED"] = {
 		-- [[ Icecrown Citadel ]] --
 		[70952] = { -- Invocation of Blood (Prince Valanar)
-			[38008] = "Valanar Empowered" -- Blood Orb Controller
+			[38008] = "Valanar Empowered", -- Blood Orb Controller
+			[37970] = "Valanar Empowered", -- Príncipe Valanar (UltimoWow)
 		},
 		[70981] = { -- Invocation of Blood (Prince Keleseth)
-			[38008] = "Keleseth Empowered" -- Blood Orb Controller
+			[38008] = "Keleseth Empowered", -- Blood Orb Controller
+			[37972] = "Keleseth Empowered", -- Príncipe Keleseth (UltimoWow)
 		},
 		[70982] = { -- Invocation of Blood (Prince Taldaram)
-			[38008] = "Taldaram Empowered" -- Blood Orb Controller
+			[38008] = "Taldaram Empowered", -- Blood Orb Controller
+			[37973] = "Taldaram Empowered", -- Príncipe Taldaram (UltimoWow)
 		},
 	},
 	["SPELL_AURA_APPLIED_DOSE"] = {
