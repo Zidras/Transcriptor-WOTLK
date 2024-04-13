@@ -2342,12 +2342,12 @@ function Transcriptor:StopLog(silent)
 										else
 											local t = list[i] - list[i-1]
 											local shorten = format("%.2f", t/1000)
-											if shorten == "0.0" then
+											if shorten == "0.00" then
 												local typeNext = type(list[i+1])
 												if typeNext == "number" then
 													local nextT = list[i+1] - list[i]
 													local nextShorten = format("%.2f", nextT/1000)
-													if nextShorten == "0.0" then
+													if nextShorten == "0.00" then
 														zeroCounter = zeroCounter + 1
 													else
 														str = format("%s[+%d]", str, zeroCounter)
