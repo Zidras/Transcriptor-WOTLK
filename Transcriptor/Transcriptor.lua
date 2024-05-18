@@ -2095,14 +2095,14 @@ function Transcriptor:StopLog(silent)
 											for eventIndex, eventInfo in ipairs(cachedEventList) do
 												local eventTime = eventInfo[1]
 												local eventName = eventInfo[2]
-												local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 											end
 
 											for j = #cachedEventList, 1, -1 do
 												local eventTime = cachedEventList[j][1]
-												local spellSincePreviousTime = (list[i]-eventTime)/1000
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 											end
@@ -2110,7 +2110,7 @@ function Transcriptor:StopLog(silent)
 											local eventString = tconcat(cachedEventString, ", ")
 											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 										else
 											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 										end
@@ -2194,14 +2194,14 @@ function Transcriptor:StopLog(silent)
 											for eventIndex, eventInfo in ipairs(cachedEventList) do
 												local eventTime = eventInfo[1]
 												local eventName = eventInfo[2]
-												local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 											end
 
 											for j = #cachedEventList, 1, -1 do
 												local eventTime = cachedEventList[j][1]
-												local spellSincePreviousTime = (list[i]-eventTime)/1000
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 											end
@@ -2209,7 +2209,7 @@ function Transcriptor:StopLog(silent)
 											local eventString = tconcat(cachedEventString, ", ")
 											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 										else
 											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 										end
@@ -2293,14 +2293,14 @@ function Transcriptor:StopLog(silent)
 											for eventIndex, eventInfo in ipairs(cachedEventList) do
 												local eventTime = eventInfo[1]
 												local eventName = eventInfo[2]
-												local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 											end
 
 											for j = #cachedEventList, 1, -1 do
 												local eventTime = cachedEventList[j][1]
-												local spellSincePreviousTime = (list[i]-eventTime)/1000
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 											end
@@ -2308,7 +2308,7 @@ function Transcriptor:StopLog(silent)
 											local eventString = tconcat(cachedEventString, ", ")
 											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 										else
 											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 										end
@@ -2393,14 +2393,14 @@ function Transcriptor:StopLog(silent)
 											for eventIndex, eventInfo in ipairs(cachedEventList) do
 												local eventTime = eventInfo[1]
 												local eventName = eventInfo[2]
-												local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 											end
 
 											for j = #cachedEventList, 1, -1 do
 												local eventTime = cachedEventList[j][1]
-												local spellSincePreviousTime = (list[i]-eventTime)/1000
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 											end
@@ -2408,7 +2408,7 @@ function Transcriptor:StopLog(silent)
 											local eventString = tconcat(cachedEventString, ", ")
 											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 										else
 											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 										end
@@ -2509,14 +2509,14 @@ function Transcriptor:StopLog(silent)
 											for eventIndex, eventInfo in ipairs(cachedEventList) do
 												local eventTime = eventInfo[1]
 												local eventName = eventInfo[2]
-												local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 											end
 
 											for j = #cachedEventList, 1, -1 do
 												local eventTime = cachedEventList[j][1]
-												local spellSincePreviousTime = (list[i]-eventTime)/1000
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 											end
@@ -2524,7 +2524,7 @@ function Transcriptor:StopLog(silent)
 											local eventString = tconcat(cachedEventString, ", ")
 											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 										else
 											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 										end
@@ -2607,14 +2607,14 @@ function Transcriptor:StopLog(silent)
 											for eventIndex, eventInfo in ipairs(cachedEventList) do
 												local eventTime = eventInfo[1]
 												local eventName = eventInfo[2]
-												local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 											end
 
 											for j = #cachedEventList, 1, -1 do
 												local eventTime = cachedEventList[j][1]
-												local spellSincePreviousTime = (list[i]-eventTime)/1000
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 											end
@@ -2622,7 +2622,7 @@ function Transcriptor:StopLog(silent)
 											local eventString = tconcat(cachedEventString, ", ")
 											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 										else
 											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 										end
@@ -2705,14 +2705,14 @@ function Transcriptor:StopLog(silent)
 										for eventIndex, eventInfo in ipairs(cachedEventList) do
 											local eventTime = eventInfo[1]
 											local eventName = eventInfo[2]
-											local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+											local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 											tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 										end
 
 										for j = #cachedEventList, 1, -1 do
 											local eventTime = cachedEventList[j][1]
-											local spellSincePreviousTime = (list[i]-eventTime)/1000
+											local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 											tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 										end
@@ -2720,7 +2720,7 @@ function Transcriptor:StopLog(silent)
 										local eventString = tconcat(cachedEventString, ", ")
 										local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-										str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+										str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 									else
 										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 									end
@@ -2802,14 +2802,14 @@ function Transcriptor:StopLog(silent)
 										for eventIndex, eventInfo in ipairs(cachedEventList) do
 											local eventTime = eventInfo[1]
 											local eventName = eventInfo[2]
-											local sincePreviousTime = (eventIndex == 1) and (eventTime-list[1][1])/1000 or (eventTime-cachedEventList[i-1][1])/1000 -- since pull timer if first event or since previous
+											local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
 
 											tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
 										end
 
 										for j = #cachedEventList, 1, -1 do
 											local eventTime = cachedEventList[j][1]
-											local spellSincePreviousTime = (list[i]-eventTime)/1000
+											local spellSincePreviousTime = (list[i] - eventTime)/1000
 
 											tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
 										end
@@ -2817,7 +2817,7 @@ function Transcriptor:StopLog(silent)
 										local eventString = tconcat(cachedEventString, ", ")
 										local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
 
-										str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/20.78, Intermission 1/30.22, Stage 2/45.86] 54.14/69.77/79.22/89.14
+										str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
 									else
 										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
 									end
