@@ -36,6 +36,7 @@ local hiddenAuraPermList = {
 	--[209997] = true, -- Play Dead (Hunter Pet)
 }
 local previousSpecialEvent = nil
+local specialEventsSincePullList = {}
 local hiddenAuraEngageList = nil
 local shouldLogFlags = false
 --local inEncounter, blockingRelease, limitingRes = false, false, false
@@ -52,6 +53,7 @@ local debugprofilestop = debugprofilestop
 --local C_Scenario, C_DeathInfo_GetSelfResurrectOptions, Enum = C_Scenario, C_DeathInfo.GetSelfResurrectOptions, Enum
 --local IsEncounterInProgress, IsEncounterLimitingResurrections, IsEncounterSuppressingRelease = IsEncounterInProgress, IsEncounterLimitingResurrections, IsEncounterSuppressingRelease
 --local IsAltKeyDown, EJ_GetEncounterInfo, C_EncounterJournal_GetSectionInfo, C_Map_GetMapInfo = IsAltKeyDown, EJ_GetEncounterInfo, C_EncounterJournal.GetSectionInfo, C_Map.GetMapInfo
+local CopyTable = CopyTable
 local IsAltKeyDown = IsAltKeyDown
 local UnitInRaid, UnitInParty, UnitIsFriend, UnitCastingInfo, UnitChannelInfo = UnitInRaid, UnitInParty, UnitIsFriend, UnitCastingInfo, UnitChannelInfo
 local UnitCanAttack, UnitExists, UnitIsVisible, UnitGUID, UnitClassification = UnitCanAttack, UnitExists, UnitIsVisible, UnitGUID, UnitClassification
@@ -112,6 +114,7 @@ local function InsertSpecialEvent(name)
 	if not name then return end
 	local t = debugprofilestop()
 	previousSpecialEvent = {t, name}
+	tinsert(specialEventsSincePullList, previousSpecialEvent)
 	if compareSuccess then
 		for _,tbl in next, compareSuccess do
 			for _, list in next, tbl do
@@ -731,7 +734,8 @@ do
 				local npcIdString = MobId(sourceGUID, true)
 				if not compareSuccess[spellId][npcIdString] then
 					if previousSpecialEvent then
-						compareSuccess[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+						local specialEventCache = CopyTable(specialEventsSincePullList)
+						compareSuccess[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 					else
 						compareSuccess[spellId][npcIdString] = {compareStartTime}
 					end
@@ -744,7 +748,8 @@ do
 				local npcIdString = MobId(sourceGUID, true)
 				if not compareStart[spellId][npcIdString] then
 					if previousSpecialEvent then
-						compareStart[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+						local specialEventCache = CopyTable(specialEventsSincePullList)
+						compareStart[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 					else
 						compareStart[spellId][npcIdString] = {compareStartTime}
 					end
@@ -757,7 +762,8 @@ do
 				local npcIdString = MobId(sourceGUID, true)
 				if not compareSummon[spellId][npcIdString] then
 					if previousSpecialEvent then
-						compareSummon[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+						local specialEventCache = CopyTable(specialEventsSincePullList)
+						compareSummon[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 					else
 						compareSummon[spellId][npcIdString] = {compareStartTime}
 					end
@@ -770,7 +776,8 @@ do
 				local npcIdString = MobId(sourceGUID, true)
 				if not compareAuraApplied[spellId][npcIdString] then
 					if previousSpecialEvent then
-						compareAuraApplied[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+						local specialEventCache = CopyTable(specialEventsSincePullList)
+						compareAuraApplied[spellId][npcIdString] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 					else
 						compareAuraApplied[spellId][npcIdString] = {compareStartTime}
 					end
@@ -1049,7 +1056,8 @@ do
 				local npcId = MobId(UnitGUID(unit), true)
 				if not compareUnitSuccess[spellName][npcId] then
 					if previousSpecialEvent then
-						compareUnitSuccess[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+						local specialEventCache = CopyTable(specialEventsSincePullList)
+						compareUnitSuccess[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 					else
 						compareUnitSuccess[spellName][npcId] = {compareStartTime}
 					end
@@ -1084,7 +1092,8 @@ do
 			local npcId = MobId(UnitGUID(unit), true)
 			if not compareUnitStart[spellName][npcId] then
 				if previousSpecialEvent then
-					compareUnitStart[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+					local specialEventCache = CopyTable(specialEventsSincePullList)
+					compareUnitStart[spellName][npcId] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 				else
 					compareUnitStart[spellName][npcId] = {compareStartTime}
 				end
@@ -1281,7 +1290,8 @@ function sh.CHAT_MSG_RAID_BOSS_EMOTE(msg, npcName, ...)
 			if not compareEmotes[spellId] then compareEmotes[spellId] = {} end
 			if not compareEmotes[spellId][npcName] then
 				if previousSpecialEvent then
-					compareEmotes[spellId][npcName] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+					local specialEventCache = CopyTable(specialEventsSincePullList)
+					compareEmotes[spellId][npcName] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 				else
 					compareEmotes[spellId][npcName] = {compareStartTime}
 				end
@@ -1301,7 +1311,8 @@ function sh.CHAT_MSG_MONSTER_YELL(msg, npcName, ...)
 			if not compareYells[spellId] then compareYells[spellId] = {} end
 			if not compareYells[spellId][npcName] then
 				if previousSpecialEvent then
-					compareYells[spellId][npcName] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2]}}
+					local specialEventCache = CopyTable(specialEventsSincePullList)
+					compareYells[spellId][npcName] = {{compareStartTime, previousSpecialEvent[1], previousSpecialEvent[2], specialEventCache}}
 				else
 					compareYells[spellId][npcName] = {compareStartTime}
 				end
@@ -1592,10 +1603,12 @@ local function eventHandler(_, event, ...)
 		elseif event == "DBM_Kill" then
 			local mod = ...
 			previousSpecialEvent = nil -- prevent Stage from spreading if log was not stopped between pulls
+			twipe(specialEventsSincePullList)
 			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN))
 		elseif event == "DBM_Wipe" then
 			local mod = ...
 			previousSpecialEvent = nil -- prevent Stage from spreading if log was not stopped between pulls
+			twipe(specialEventsSincePullList)
 			line = strjoin("#", tostringall(mod and mod.id or UNKNOWN))
 		end
 
@@ -1953,6 +1966,7 @@ do
 			hiddenUnitAuraCollector = {}
 			playerSpellCollector = {}
 			previousSpecialEvent = nil
+			twipe(specialEventsSincePullList)
 			compareStartTime = debugprofilestop()
 			logStartTime = compareStartTime / 1000
 			local instanceName, instanceType, diff, diffText = GetCurrentInstanceDifficulty()
@@ -2073,7 +2087,33 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										local cachedEventList = list[1][4]
+										if type(cachedEventList) == "table" then
+											local cachedEventString = {}
+											local cachedSpellTimeDiffString = {}
+
+											for eventIndex, eventInfo in ipairs(cachedEventList) do
+												local eventTime = eventInfo[1]
+												local eventName = eventInfo[2]
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+											end
+
+											for j = #cachedEventList, 1, -1 do
+												local eventTime = cachedEventList[j][1]
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+											end
+
+											local eventString = tconcat(cachedEventString, ", ")
+											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+										else
+											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+										end
 									else
 										local sincePull = list[i] - list[1]
 										str = format("%s = pull:%.2f", n, sincePull/1000)
@@ -2146,7 +2186,33 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										local cachedEventList = list[1][4]
+										if type(cachedEventList) == "table" then
+											local cachedEventString = {}
+											local cachedSpellTimeDiffString = {}
+
+											for eventIndex, eventInfo in ipairs(cachedEventList) do
+												local eventTime = eventInfo[1]
+												local eventName = eventInfo[2]
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+											end
+
+											for j = #cachedEventList, 1, -1 do
+												local eventTime = cachedEventList[j][1]
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+											end
+
+											local eventString = tconcat(cachedEventString, ", ")
+											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+										else
+											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+										end
 									else
 										local sincePull = list[i] - list[1]
 										str = format("%s = pull:%.2f", n, sincePull/1000)
@@ -2219,7 +2285,33 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										local cachedEventList = list[1][4]
+										if type(cachedEventList) == "table" then
+											local cachedEventString = {}
+											local cachedSpellTimeDiffString = {}
+
+											for eventIndex, eventInfo in ipairs(cachedEventList) do
+												local eventTime = eventInfo[1]
+												local eventName = eventInfo[2]
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+											end
+
+											for j = #cachedEventList, 1, -1 do
+												local eventTime = cachedEventList[j][1]
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+											end
+
+											local eventString = tconcat(cachedEventString, ", ")
+											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+										else
+											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+										end
 									else
 										local sincePull = list[i] - list[1]
 										str = format("%s = pull:%.2f", n, sincePull/1000)
@@ -2293,7 +2385,33 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										local cachedEventList = list[1][4]
+										if type(cachedEventList) == "table" then
+											local cachedEventString = {}
+											local cachedSpellTimeDiffString = {}
+
+											for eventIndex, eventInfo in ipairs(cachedEventList) do
+												local eventTime = eventInfo[1]
+												local eventName = eventInfo[2]
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+											end
+
+											for j = #cachedEventList, 1, -1 do
+												local eventTime = cachedEventList[j][1]
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+											end
+
+											local eventString = tconcat(cachedEventString, ", ")
+											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+										else
+											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+										end
 									else
 										local sincePull = list[i] - list[1]
 										str = format("%s = pull:%.2f", n, sincePull/1000)
@@ -2383,7 +2501,33 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										local cachedEventList = list[1][4]
+										if type(cachedEventList) == "table" then
+											local cachedEventString = {}
+											local cachedSpellTimeDiffString = {}
+
+											for eventIndex, eventInfo in ipairs(cachedEventList) do
+												local eventTime = eventInfo[1]
+												local eventName = eventInfo[2]
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+											end
+
+											for j = #cachedEventList, 1, -1 do
+												local eventTime = cachedEventList[j][1]
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+											end
+
+											local eventString = tconcat(cachedEventString, ", ")
+											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+										else
+											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+										end
 									else
 										local sincePull = list[i] - list[1]
 										str = format("%s = pull:%.2f", n, sincePull/1000)
@@ -2455,7 +2599,33 @@ function Transcriptor:StopLog(silent)
 										local sincePull = list[i] - list[1][1]
 										local sincePreviousEvent = list[i] - list[1][2]
 										local previousEventName = list[1][3]
-										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
+										local cachedEventList = list[1][4]
+										if type(cachedEventList) == "table" then
+											local cachedEventString = {}
+											local cachedSpellTimeDiffString = {}
+
+											for eventIndex, eventInfo in ipairs(cachedEventList) do
+												local eventTime = eventInfo[1]
+												local eventName = eventInfo[2]
+												local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+												tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+											end
+
+											for j = #cachedEventList, 1, -1 do
+												local eventTime = cachedEventList[j][1]
+												local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+												tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+											end
+
+											local eventString = tconcat(cachedEventString, ", ")
+											local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+											str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+										else
+											str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+										end
 									else
 										local sincePull = list[i] - list[1]
 										str = format("%s = pull:%.2f", n, sincePull/1000)
@@ -2527,8 +2697,34 @@ function Transcriptor:StopLog(silent)
 									local sincePull = list[i] - list[1][1]
 									local sincePreviousEvent = list[i] - list[1][2]
 									local previousEventName = list[1][3]
-									str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
-								else
+									local cachedEventList = list[1][4]
+									if type(cachedEventList) == "table" then
+										local cachedEventString = {}
+										local cachedSpellTimeDiffString = {}
+
+										for eventIndex, eventInfo in ipairs(cachedEventList) do
+											local eventTime = eventInfo[1]
+											local eventName = eventInfo[2]
+											local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+											tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+										end
+
+										for j = #cachedEventList, 1, -1 do
+											local eventTime = cachedEventList[j][1]
+											local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+											tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+										end
+
+										local eventString = tconcat(cachedEventString, ", ")
+										local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+										str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+									else
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+									end
+							else
 									local sincePull = list[i] - list[1]
 									str = format("%s = pull:%.2f", n, sincePull/1000)
 								end
@@ -2598,8 +2794,34 @@ function Transcriptor:StopLog(silent)
 									local sincePull = list[i] - list[1][1]
 									local sincePreviousEvent = list[i] - list[1][2]
 									local previousEventName = list[1][3]
-									str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000)
-								else
+									local cachedEventList = list[1][4]
+									if type(cachedEventList) == "table" then
+										local cachedEventString = {}
+										local cachedSpellTimeDiffString = {}
+
+										for eventIndex, eventInfo in ipairs(cachedEventList) do
+											local eventTime = eventInfo[1]
+											local eventName = eventInfo[2]
+											local sincePreviousTime = eventIndex == 1 and (eventTime - list[1][1])/1000 or (eventTime - cachedEventList[eventIndex-1][1])/1000 -- since pull timer if first event or since previous
+
+											tinsert(cachedEventString, format("%s/%.2f", eventName, sincePreviousTime))
+										end
+
+										for j = #cachedEventList, 1, -1 do
+											local eventTime = cachedEventList[j][1]
+											local spellSincePreviousTime = (list[i] - eventTime)/1000
+
+											tinsert(cachedSpellTimeDiffString, format("%.2f", spellSincePreviousTime))
+										end
+
+										local eventString = tconcat(cachedEventString, ", ")
+										local timeDiffString = tconcat(cachedSpellTimeDiffString, "/")
+
+										str = format("%s = pull:%.2f/[%s] %s", n, sincePull/1000, eventString, timeDiffString) -- pull:100.00/[Stage 1/10.00, Stage 1.5/10.78, Intermission 1/9.44, Stage 2/15.64] 54.14/69.77/79.22/89.14
+									else
+										str = format("%s = pull:%.2f/%s/%.2f", n, sincePull/1000, previousEventName, sincePreviousEvent/1000) -- pull:125.69/Stage 2/26.85
+									end
+							else
 									local sincePull = list[i] - list[1]
 									str = format("%s = pull:%.2f", n, sincePull/1000)
 								end
