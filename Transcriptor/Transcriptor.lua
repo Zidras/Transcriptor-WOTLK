@@ -228,6 +228,87 @@ function GetSectionID(name)
 end]]
 
 --------------------------------------------------------------------------------
+-- Difficulty
+--
+
+--[[local difficultyTbl = {
+	["party"] = {
+		[1] = "5Normal",
+		[2] = "5Heroic",
+	},
+	["raid"] = {
+		[1] = "10Normal",
+		[2] = "25Normal",
+		[3] = "10Heroic",
+		[4] = "25Heroic",
+	},
+	["none"] = {
+		[1] = NONE
+	}
+	[7] = "25LFR",
+	[8] = "5Challenge",
+	[14] = "Normal",
+	[15] = "Heroic",
+	[16] = "Mythic",
+	[17] = "LFR",
+	[18] = "40Event",
+	[19] = "5Event",
+	[23] = "5Mythic",
+	[24] = "5Timewalking",
+	[33] = "RaidTimewalking",
+}]]
+
+-- Copied from DBM backport
+local function GetCurrentInstanceDifficulty()
+	local instanceName, instanceType, difficulty, difficultyName, maxPlayers, dynamicDifficulty, isDynamicInstance = GetInstanceInfo()
+	if instanceType == "raid" then
+		if isDynamicInstance then -- Dynamic raids (ICC, RS)
+			if difficulty == 1 then -- 10 players
+				return instanceName, instanceType, difficulty, dynamicDifficulty == 0 and "10 Normal" or dynamicDifficulty == 1 and "10 Heroic" or "unknown"
+			elseif difficulty == 2 then -- 25 players
+				return instanceName, instanceType, difficulty, dynamicDifficulty == 0 and "25 Normal" or dynamicDifficulty == 1 and "25 Heroic" or "unknown"
+			-- On Warmane, it was confirmed by Midna that difficulty returning only 1 or 2 is their intended behaviour: https://www.warmane.com/bugtracker/report/91065
+			-- code below (difficulty 3 and 4 in dynamic instances) prevents GetCurrentInstanceDifficulty() from breaking on servers that correctly assign difficulty 1-4 in dynamic instances.
+			elseif difficulty == 3 then -- 10 heroic, dynamic
+				return instanceName, instanceType, difficulty, "10 Heroic"
+			elseif difficulty == 4 then -- 25 heroic, dynamic
+				return instanceName, instanceType, difficulty, "25 Heroic"
+			end
+		else -- Non-dynamic raids
+			if difficulty == 1 then
+				-- check for Timewalking instance (workaround using GetRaidDifficulty since on Warmane all the usual APIs fail and return "normal" difficulty)
+				local raidDifficulty = GetRaidDifficulty()
+				if raidDifficulty ~= difficulty and (raidDifficulty == 2 or raidDifficulty == 4) then -- extra checks due to lack of tests and no access to a timewalking server
+					return instanceName, instanceType, raidDifficulty, "Timewalking"
+				else
+					return instanceName, instanceType, difficulty, maxPlayers and maxPlayers.." Normal" or "10 Normal"
+				end
+			elseif difficulty == 2 then
+				return instanceName, instanceType, difficulty, "25 Normal"
+			elseif difficulty == 3 then
+				return instanceName, instanceType, difficulty, "10 Heroic"
+			elseif difficulty == 4 then
+				return instanceName, instanceType, difficulty, "25 Heroic"
+			end
+		end
+	elseif instanceType == "party" then -- 5 man Dungeons
+		if difficulty == 1 then
+			return instanceName, instanceType, difficulty, "5 Normal"
+		elseif difficulty == 2 then
+			-- check for Mythic instance (workaround using GetDungeonDifficulty since on Warmane all the usual APIs fail and return "heroic" difficulty)
+			local dungeonDifficulty = GetDungeonDifficulty()
+			if dungeonDifficulty == 3 then
+				return instanceName, instanceType, dungeonDifficulty, "Mythic"
+			else
+				return instanceName, instanceType, difficulty, "5 Heroic"
+			end
+		end
+	else
+		return instanceName, instanceType, difficulty, NONE
+	end
+end
+
+--------------------------------------------------------------------------------
 -- Spell blocklist parser: /getspells
 --
 
@@ -1262,6 +1343,11 @@ end
 sh.ZONE_CHANGED_INDOORS = sh.ZONE_CHANGED
 sh.ZONE_CHANGED_NEW_AREA = sh.ZONE_CHANGED
 
+function sh.PLAYER_DIFFICULTY_CHANGED()
+	local instanceName, instanceType, diff, diffText = GetCurrentInstanceDifficulty()
+	return strjoin("#", instanceName or "?", instanceType or "?", diff or "?", diffText or "?")
+end
+
 function sh.CINEMATIC_START(...)
 	local id = GetCurrentMapAreaID()
 	return strjoin("#", "uiMapID:", id, "Real Args:", tostringall(...))
@@ -1419,6 +1505,7 @@ local wowEvents = {
 	"ZONE_CHANGED_INDOORS",
 	"ZONE_CHANGED_NEW_AREA",
 --	"NAME_PLATE_UNIT_ADDED",
+	"PLAYER_DIFFICULTY_CHANGED",
 	-- Scenarios
 --	"SCENARIO_UPDATE",
 --	"SCENARIO_CRITERIA_UPDATE",
@@ -1474,6 +1561,7 @@ local eventCategories = {
 	ZONE_CHANGED = "ZONE_CHANGED",
 	ZONE_CHANGED_INDOORS = "ZONE_CHANGED",
 	ZONE_CHANGED_NEW_AREA = "ZONE_CHANGED",
+	PLAYER_DIFFICULTY_CHANGED = "COMBAT",
 --	SCENARIO_UPDATE = "SCENARIO",
 --	SCENARIO_CRITERIA_UPDATE = "SCENARIO",
 	PLAY_MOVIE = "MOVIE",
@@ -1841,83 +1929,6 @@ do
 end
 
 do
-	--[[local difficultyTbl = {
-		["party"] = {
-			[1] = "5Normal",
-			[2] = "5Heroic",
-		},
-		["raid"] = {
-			[1] = "10Normal",
-			[2] = "25Normal",
-			[3] = "10Heroic",
-			[4] = "25Heroic",
-		},
-		["none"] = {
-			[1] = NONE
-		}
-		[7] = "25LFR",
-		[8] = "5Challenge",
-		[14] = "Normal",
-		[15] = "Heroic",
-		[16] = "Mythic",
-		[17] = "LFR",
-		[18] = "40Event",
-		[19] = "5Event",
-		[23] = "5Mythic",
-		[24] = "5Timewalking",
-		[33] = "RaidTimewalking",
-	}]]
-
-	-- Copied from DBM backport
-	local function GetCurrentInstanceDifficulty()
-		local instanceName, instanceType, difficulty, difficultyName, maxPlayers, dynamicDifficulty, isDynamicInstance = GetInstanceInfo()
-		if instanceType == "raid" then
-			if isDynamicInstance then -- Dynamic raids (ICC, RS)
-				if difficulty == 1 then -- 10 players
-					return instanceName, instanceType, difficulty, dynamicDifficulty == 0 and "10 Normal" or dynamicDifficulty == 1 and "10 Heroic" or "unknown"
-				elseif difficulty == 2 then -- 25 players
-					return instanceName, instanceType, difficulty, dynamicDifficulty == 0 and "25 Normal" or dynamicDifficulty == 1 and "25 Heroic" or "unknown"
-				-- On Warmane, it was confirmed by Midna that difficulty returning only 1 or 2 is their intended behaviour: https://www.warmane.com/bugtracker/report/91065
-				-- code below (difficulty 3 and 4 in dynamic instances) prevents GetCurrentInstanceDifficulty() from breaking on servers that correctly assign difficulty 1-4 in dynamic instances.
-				elseif difficulty == 3 then -- 10 heroic, dynamic
-					return instanceName, instanceType, difficulty, "10 Heroic"
-				elseif difficulty == 4 then -- 25 heroic, dynamic
-					return instanceName, instanceType, difficulty, "25 Heroic"
-				end
-			else -- Non-dynamic raids
-				if difficulty == 1 then
-					-- check for Timewalking instance (workaround using GetRaidDifficulty since on Warmane all the usual APIs fail and return "normal" difficulty)
-					local raidDifficulty = GetRaidDifficulty()
-					if raidDifficulty ~= difficulty and (raidDifficulty == 2 or raidDifficulty == 4) then -- extra checks due to lack of tests and no access to a timewalking server
-						return instanceName, instanceType, raidDifficulty, "Timewalking"
-					else
-						return instanceName, instanceType, difficulty, maxPlayers and maxPlayers.." Normal" or "10 Normal"
-					end
-				elseif difficulty == 2 then
-					return instanceName, instanceType, difficulty, "25 Normal"
-				elseif difficulty == 3 then
-					return instanceName, instanceType, difficulty, "10 Heroic"
-				elseif difficulty == 4 then
-					return instanceName, instanceType, difficulty, "25 Heroic"
-				end
-			end
-		elseif instanceType == "party" then -- 5 man Dungeons
-			if difficulty == 1 then
-				return instanceName, instanceType, difficulty, "5 Normal"
-			elseif difficulty == 2 then
-				-- check for Mythic instance (workaround using GetDungeonDifficulty since on Warmane all the usual APIs fail and return "heroic" difficulty)
-				local dungeonDifficulty = GetDungeonDifficulty()
-				if dungeonDifficulty == 3 then
-					return instanceName, instanceType, dungeonDifficulty, "Mythic"
-				else
-					return instanceName, instanceType, difficulty, "5 Heroic"
-				end
-			end
-		else
-			return instanceName, instanceType, difficulty, NONE
-		end
-	end
-
 	local transcriptorVersion = GetAddOnMetadata("Transcriptor", "Version")
 	local dbmRevision = DBM and format("%s (%s)", DBM.DisplayVersion, (DBM.ShowRealDate and DBM:ShowRealDate(DBM.Revision) or DBM.Revision)) or "No DBM"
 	local wowVersion, buildRevision = GetBuildInfo() -- Note that both returns here are strings, not numbers.
