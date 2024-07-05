@@ -20,6 +20,9 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 	},
 	["SPELL_AURA_APPLIED"] = {
 		-- [[ Icecrown Citadel ]] --
+		[69076] = { -- Bone Storm
+			[36612] = "Bone Storm applied", -- Lord Marrowgar
+		},
 		[70952] = { -- Invocation of Blood (Prince Valanar)
 			[38008] = "Valanar Empowered", -- Blood Orb Controller
 			[37970] = "Valanar Empowered", -- Príncipe Valanar (UltimoWow)
@@ -37,7 +40,10 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 	},
 	["SPELL_AURA_REMOVED"] = {
 		-- [[ Icecrown Citadel ]] --
---[[
+		[69076] = { -- Bone Storm
+			[36612] = "Bone Storm removed", -- Lord Marrowgar
+		},
+		--[[
 		[70842] = { -- Mana Barrier
 			[36855] = "Stage 2", -- Lady Deathwhisper
 		},
