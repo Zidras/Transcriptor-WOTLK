@@ -19,6 +19,13 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 	["UNIT_SPELLCAST_INTERRUPTED"] = {
 	},
 	["SPELL_AURA_APPLIED"] = {
+		-- [[ Trial of the Crusader ]] --
+		[66758] = { -- Staggered Daze
+			[34797] = "Staggered", -- Icehowl
+		},
+		[66759] = { -- Frothing Rage
+			[34797] = "Enraged", -- Icehowl
+		},
 		-- [[ Icecrown Citadel ]] --
 		[69076] = { -- Bone Storm
 			[36612] = "Bone Storm applied", -- Lord Marrowgar
@@ -60,6 +67,19 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 --]]
 	},
 	["SPELL_CAST_START"] = {
+		-- [[ Trial of the Crusader ]] --
+		[66683] = { -- Massive Crash (10N)
+			[34797] = "Massive Crash start", -- Icehowl
+		},
+		[67660] = { -- Massive Crash (25N)
+			[34797] = "Massive Crash start", -- Icehowl
+		},
+		[67661] = { -- Massive Crash (10H)
+			[34797] = "Massive Crash start", -- Icehowl
+		},
+		[67662] = { -- Massive Crash (25H)
+			[34797] = "Massive Crash start", -- Icehowl
+		},
 		-- [[ Icecrown Citadel ]] --
 		[72852] = { -- Create Concoction (25H)
 			[36678] = "Intermission 1", -- Professor Putricide
@@ -87,6 +107,10 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 		},
 	},
 	["SPELL_CAST_SUCCESS"] = {
+		-- [[ Trial of the Crusader ]] --
+		[67865] = { -- Trample
+			[34797] = "Trample", -- Icehowl
+		},
 	},
 	["UNIT_DIED"] = {
 	}
