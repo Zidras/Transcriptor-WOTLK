@@ -111,6 +111,10 @@ addonTbl.TIMERS_SPECIAL_EVENTS = {
 		[67865] = { -- Trample
 			[34797] = "Trample", -- Icehowl
 		},
+		-- [[ Icecrown Citadel ]] --
+		[73070] = { -- Incite Terror
+			[37955] = "Incite Terror", -- Blood-Queen Lana'thel
+		},
 	},
 	["UNIT_DIED"] = {
 	}
