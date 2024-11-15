@@ -1868,6 +1868,8 @@ init:SetScript("OnEvent", function(self, event)
 	end
 	-- End Minimap Icon snippet
 
+	TranscriptOptions.logAllEvents = TranscriptOptions.logAllEvents or false -- custom, only for debugging. HEAVY MEMORY USAGE!
+
 	self:UnregisterEvent(event)
 	self:RegisterEvent("PLAYER_LOGOUT")
 	self:SetScript("OnEvent", function()
@@ -1992,10 +1994,14 @@ do
 			if type(currentLog.total) ~= "table" then currentLog.total = {} end
 			--Register Events to be Tracked
 			eventFrame:Show()
-			for i = 1, #wowEvents do
-				local event = wowEvents[i]
-				if not TranscriptIgnore[event] then
-					eventFrame:RegisterEvent(event)
+			if TranscriptOptions.logAllEvents then
+				eventFrame:RegisterAllEvents()
+			else
+				for i = 1, #wowEvents do
+					local event = wowEvents[i]
+					if not TranscriptIgnore[event] then
+						eventFrame:RegisterEvent(event)
+					end
 				end
 			end
 			if BigWigsLoader then
@@ -2061,10 +2067,14 @@ function Transcriptor:StopLog(silent)
 
 		--Clear Events
 		eventFrame:Hide()
-		for i = 1, #wowEvents do
-			local event = wowEvents[i]
-			if not TranscriptIgnore[event] then
-				eventFrame:UnregisterEvent(event)
+		if TranscriptOptions.logAllEvents then
+			eventFrame:UnregisterAllEvents()
+		else
+			for i = 1, #wowEvents do
+				local event = wowEvents[i]
+				if not TranscriptIgnore[event] then
+					eventFrame:UnregisterEvent(event)
+				end
 			end
 		end
 		if BigWigsLoader then
