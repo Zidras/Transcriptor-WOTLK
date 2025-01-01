@@ -82,7 +82,7 @@ end
 
 local function MobId(guid, extra)
 	if not guid then return 1 end
-	local strId = tonumber(guid:sub(9, 12), 16) or 1
+	local strId = tonumber(guid:sub(8, 12), 16) or 1
 	if extra then
 		local uniq = tonumber(guid:sub(13), 16) or 1 -- spawnCounter
 		return strId.."-"..uniq
