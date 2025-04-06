@@ -1411,38 +1411,53 @@ end
 
 do
 	local UnitAura = UnitAura
+	local unitAuraCache = {}
 	function sh.UNIT_AURA(unit)
+		twipe(unitAuraCache)
 		for i = 1, 100 do
-			local name, _, _, _, _, duration, _, _, _, _, spellId = UnitAura(unit, i, "HARMFUL")
+			local name, _, _, count, dispelType, duration, _, caster, _, _, spellId = UnitAura(unit, i, "HARMFUL")
 			if not spellId then
 				break
-			elseif not hiddenAuraEngageList[spellId] and not hiddenUnitAuraCollector[spellId] and not PLAYER_SPELL_BLOCKLIST[spellId] then
-				if UnitIsVisible(unit) then
-					--[[if bossDebuff then
-						hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("BOSS_DEBUFF", spellId, name, duration, unit, UnitName(unit)))
-					else]]
-						hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall(spellId, name, duration, unit, UnitName(unit)))
-					--end
-				else -- If it's not visible it may not show up in CLEU, use this as an indicator of a false positive
-					hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("UNIT_NOT_VISIBLE", spellId, name, duration, unit, UnitName(unit)))
+			else
+				if TranscriptOptions.logAllEvents then
+					tinsert(unitAuraCache, strjoin("#", tostringall("Debuff "..i, spellId, name, count, dispelType, duration, caster)))
+				end
+				if not hiddenAuraEngageList[spellId] and not hiddenUnitAuraCollector[spellId] and not PLAYER_SPELL_BLOCKLIST[spellId] then
+					if UnitIsVisible(unit) then
+						--[[if bossDebuff then
+							hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("BOSS_DEBUFF", spellId, name, duration, unit, UnitName(unit)))
+						else]]
+							hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall(spellId, name, duration, unit, UnitName(unit)))
+						--end
+					else -- If it's not visible it may not show up in CLEU, use this as an indicator of a false positive
+						hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("UNIT_NOT_VISIBLE", spellId, name, duration, unit, UnitName(unit)))
+					end
 				end
 			end
 		end
 		for i = 1, 100 do
-			local name, _, _, _, _, duration, _, _, _, _, spellId = UnitAura(unit, i, "HELPFUL")
+			local name, _, _, count, dispelType, duration, _, caster, _, _, spellId = UnitAura(unit, i, "HELPFUL")
 			if not spellId then
 				break
-			elseif not hiddenAuraEngageList[spellId] and not hiddenUnitAuraCollector[spellId] and not PLAYER_SPELL_BLOCKLIST[spellId] then
-				if UnitIsVisible(unit) then
-					--[[if bossDebuff then
-						hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("BOSS_BUFF", spellId, name, duration, unit, UnitName(unit)))
-					else]]
-						hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall(spellId, name, duration, unit, UnitName(unit)))
-					--end
-				else -- If it's not visible it may not show up in CLEU, use this as an indicator of a false positive
-					hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("UNIT_NOT_VISIBLE", spellId, name, duration, unit, UnitName(unit)))
+			else
+				if TranscriptOptions.logAllEvents then
+					tinsert(unitAuraCache, strjoin("#", tostringall("Buff "..i, spellId, name, count, dispelType, duration, caster)))
+				end
+				if not hiddenAuraEngageList[spellId] and not hiddenUnitAuraCollector[spellId] and not PLAYER_SPELL_BLOCKLIST[spellId] then
+					if UnitIsVisible(unit) then
+						--[[if bossDebuff then
+							hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("BOSS_BUFF", spellId, name, duration, unit, UnitName(unit)))
+						else]]
+							hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall(spellId, name, duration, unit, UnitName(unit)))
+						--end
+					else -- If it's not visible it may not show up in CLEU, use this as an indicator of a false positive
+						hiddenUnitAuraCollector[spellId] = strjoin("#", tostringall("UNIT_NOT_VISIBLE", spellId, name, duration, unit, UnitName(unit)))
+					end
 				end
 			end
+		end
+		if TranscriptOptions.logAllEvents then
+			return strjoin("#", unit, UnitName(unit), tconcat(unitAuraCache, ", "))
 		end
 	end
 end
