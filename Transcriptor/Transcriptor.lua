@@ -1387,6 +1387,7 @@ function sh.CHAT_MSG_RAID_BOSS_EMOTE(msg, npcName, ...)
 	end
 	return strjoin("#", msg, npcName, tostringall(...))
 end
+sh.CHAT_MSG_RAID_BOSS_WHISPER = sh.CHAT_MSG_RAID_BOSS_EMOTE
 
 function sh.CHAT_MSG_MONSTER_YELL(msg, npcName, ...)
 	local id = strmatch(msg, "|Hspell:([^|]+)|h")
