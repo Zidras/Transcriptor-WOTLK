@@ -1681,9 +1681,9 @@ local function eventHandler(_, event, ...)
 	if TranscriptIgnore[event] then return end
 	local line
 	if sh[event] then
-		line = sh[event](...)
+		line = sh[event](...) or TranscriptOptions.logAllEvents and "nil"
 	else
-		line = strjoin("#", tostringall(...))
+		line = strjoin("#", tostringall(...)) or TranscriptOptions.logAllEvents and "nil"
 	end
 	if not line then return end
 	local stop = debugprofilestop() / 1000
